@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react",
+    "module": "commonjs",
+    "noUnusedLocals": true,
+    "outDir": "build",
+    "removeComments": true,
+    "target": "es6"
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/server/**/*"]
+}
+

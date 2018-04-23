@@ -1,0 +1,1 @@
+export const WIKIDATA_URL = 'https://www.wikidata.org/w/api.php'

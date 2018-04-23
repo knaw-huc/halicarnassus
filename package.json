@@ -1,0 +1,38 @@
+{
+  "name": "civslog",
+  "version": "1.0.7",
+  "description": "The journal of civilization",
+  "repository": "https://github.com/chronovis/civslog.git",
+  "scripts": {
+    "start": "docker-compose -p civslog up --build",
+    "watch-client": "webpack -w --mode development",
+    "watch-express": "tsc -w"
+  },
+  "author": "Gijsjan Brouwer",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.11.1",
+    "@types/pg": "^7.4.5",
+    "@types/react": "^16.1.0",
+    "@types/react-dom": "^16.0.4",
+    "awesome-typescript-loader": "^4.0.1",
+    "connect-modrewrite": "^0.10.2",
+    "nodemon": "^1.17.2",
+    "proxy-middleware": "^0.15.0",
+    "ts-loader": "^4.1.0",
+    "typescript": "2.8.1",
+    "url": "^0.11.0",
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.14"
+  },
+  "dependencies": {
+    "chalk": "^2.3.2",
+    "express": "^4.16.3",
+    "express-http-proxy": "^1.1.0",
+    "node-fetch": "^2.1.2",
+    "pg": "^7.4.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "timeline": "^1.1.5"
+  }
+}

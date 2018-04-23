@@ -1,0 +1,57 @@
+version: "3"
+
+services:
+  psql:
+    image: mdillon/postgis:10-alpine
+
+  db:
+    environment:
+      - POSTGRES_PASSWORD=postgis
+    image: mdillon/postgis:10-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - timeline_db:/var/lib/postgresql/data
+
+  express:
+    image: node:9-alpine
+    command: ["node_modules/.bin/nodemon", "build/server/index.js"]
+    depends_on:
+      - db
+    environment:
+      - NODE_ENV=development
+      - PGUSER=postgres
+      - PGPASSWORD=postgis
+      - PGDATABASE=timeline
+      - PGHOST=db
+    ports:
+      - "3333:3000"
+    user: node
+    volumes:
+      - ./:/app
+      - ../timeline:/app/node_modules/timeline
+      - ../civslog-map:/app/node_modules/civslog-map
+    working_dir: /app
+
+  watch-express:
+    image: node:9-alpine
+    command: ["npm", "run", "watch-express"]
+    user: node
+    volumes:
+      - ./:/app
+      - ../timeline:/app/node_modules/timeline
+      - ../civslog-map:/app/node_modules/civslog-map
+    working_dir: /app
+
+  watch-client:
+    image: node:9-alpine
+    command: ["npm", "run", "watch-client"]
+    user: node
+    volumes:
+      - ./:/app
+      - ../timeline:/app/node_modules/timeline
+      - ../civslog-map:/app/node_modules/civslog-map
+    working_dir: /app
+
+volumes:
+  timeline_db:
