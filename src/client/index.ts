@@ -13,7 +13,7 @@ async function go() {
 	const viewportWidth = timelineEl.getBoundingClientRect().width
 
 	const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&visibleRatio=.01`)
-	const [events, from, to, grid, rowCount] = await response.json()
+	const [events, from, to, /* grid */, rowCount] = await response.json()
 
 	function handleEvent(name, data) {
 		if (name === 'OPEN_IFRAME') {
@@ -31,7 +31,7 @@ async function go() {
 	})
 
 	const timeline = new Timeline({
-		handleEvent,
+		// handleEvent,
 		domains: [
 			{
 				components: new Set(['EVENTS' as 'EVENTS', 'RULERS' as 'RULERS']),

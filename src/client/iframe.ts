@@ -14,7 +14,7 @@ export default class Iframe {
 		this.props.root.innerHTML = this.template()
 		this.iframe = props.root.getElementsByTagName('iframe')[0]
 		this.props.root.addEventListener('click', (ev) => {
-			if (ev.target.matches('ul.menu li.close')) {
+			if ((ev.target as HTMLElement).matches('ul.menu li.close')) {
 				this.hide()
 				this.iframe.src = ''
 			}

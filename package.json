@@ -1,6 +1,6 @@
 {
   "name": "civslog",
-  "version": "1.0.7",
+  "version": "1.0.0",
   "description": "The journal of civilization",
   "repository": "https://github.com/chronovis/civslog.git",
   "scripts": {
