@@ -1,9 +1,6 @@
 version: "3"
 
 services:
-  psql:
-    image: mdillon/postgis:10-alpine
-
   db:
     environment:
       - POSTGRES_PASSWORD=postgis
@@ -15,7 +12,7 @@ services:
 
   express:
     image: node:9-alpine
-    command: ["node_modules/.bin/nodemon", "build/server/index.js"]
+    command: ["node", "build/server/index.js"]
     depends_on:
       - db
     environment:
@@ -29,28 +26,6 @@ services:
     user: node
     volumes:
       - ./:/app
-      - ../timeline:/app/node_modules/timeline
-      - ../civslog-map:/app/node_modules/civslog-map
-    working_dir: /app
-
-  watch-express:
-    image: node:9-alpine
-    command: ["npm", "run", "watch-express"]
-    user: node
-    volumes:
-      - ./:/app
-      - ../timeline:/app/node_modules/timeline
-      - ../civslog-map:/app/node_modules/civslog-map
-    working_dir: /app
-
-  watch-client:
-    image: node:9-alpine
-    command: ["npm", "run", "watch-client"]
-    user: node
-    volumes:
-      - ./:/app
-      - ../timeline:/app/node_modules/timeline
-      - ../civslog-map:/app/node_modules/civslog-map
     working_dir: /app
 
 volumes:

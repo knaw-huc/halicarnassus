@@ -4,7 +4,8 @@
   "description": "The journal of civilization",
   "repository": "https://github.com/chronovis/civslog.git",
   "scripts": {
-    "start": "docker-compose -p civslog up --build",
+    "start": "./start.sh",
+    "start:dev": "./start-dev.sh",
     "watch-client": "webpack -w --mode development",
     "watch-express": "tsc -w"
   },
@@ -27,12 +28,13 @@
   },
   "dependencies": {
     "chalk": "^2.3.2",
+    "civslog-map": "^1.0.0",
     "express": "^4.16.3",
     "express-http-proxy": "^1.1.0",
     "node-fetch": "^2.1.2",
     "pg": "^7.4.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "timeline": "^1.1.5"
+    "timeline": "^2.0.1"
   }
 }
