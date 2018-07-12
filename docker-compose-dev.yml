@@ -36,7 +36,6 @@ services:
   watch-express:
     image: node:9-alpine
     command: ["npm", "run", "watch-express"]
-    user: node
     volumes:
       - ./:/app
       - ../timeline:/app/node_modules/timeline
@@ -46,7 +45,6 @@ services:
   watch-client:
     image: node:9-alpine
     command: ["npm", "run", "watch-client"]
-    user: node
     volumes:
       - ./:/app
       - ../timeline:/app/node_modules/timeline

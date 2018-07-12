@@ -2,4 +2,4 @@
 
 webpack --mode development
 tsc
-docker-compose -p civslog up --build
+docker-compose -p civslog -f docker-compose-dev.yml up --build
