@@ -1,4 +1,4 @@
-version: "3"
+version: "3.6"
 
 services:
   psql:
@@ -19,14 +19,14 @@ services:
     depends_on:
       - db
     environment:
-      - NODE_ENV=development
-      - PGUSER=postgres
-      - PGPASSWORD=postgis
-      - PGDATABASE=timeline
-      - PGHOST=db
+      NODE_ENV: development
+      PGHOST: db
     ports:
       - "3333:3000"
-    user: node
+    secrets:
+      - civslog_db_name
+      - civslog_db_user
+      - civslog_db_password
     volumes:
       - ./:/app
       - ../timeline:/app/node_modules/timeline
@@ -53,3 +53,11 @@ services:
 
 volumes:
   timeline_db:
+
+secrets:
+  civslog_db_name:
+    external: true
+  civslog_db_user:
+    external: true
+  civslog_db_password:
+    external: true
