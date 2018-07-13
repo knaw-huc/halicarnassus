@@ -73,6 +73,7 @@ const template = (body: string): string =>
 		</div>
 		<aside id="iframe-left-container"></aside>
 		<aside id="iframe-container"></aside>
+		${process.env.NODE_ENV === 'development' ? '<script src="/reload/reload.js"></script>' : ''}
 	</body>
 </html>`
 

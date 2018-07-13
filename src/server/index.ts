@@ -1,3 +1,4 @@
+import * as reload from 'reload'
 import * as path from 'path'
 import * as express from 'express'
 import template from './template'
@@ -36,6 +37,8 @@ app.get('/api/events', async (req, res) => {
 	const events = await execSql(selectEvents())
 	res.send(JSON.stringify(orderEvents(events, viewportWidth, visibleRatio)))
 })
+
+if (process.env.NODE_ENV === 'development') reload(app)
 
 const PORT = 3000
 app.listen(PORT)

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-webpack --mode development
-tsc
+node_modules/.bin/webpack --mode development
+node_modules/.bin/tsc
 docker-compose -p civslog -f docker-compose-dev.yml up --build

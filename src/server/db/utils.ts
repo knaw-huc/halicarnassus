@@ -1,8 +1,4 @@
-import { readFileSync } from 'fs'
-import * as pg from "pg"
-pg.types.setTypeParser(20, function (value) {
-    return parseInt(value);
-});
+import createPool from './pool'
 import { logError } from '../utils'
 
 export const selectOne = async (table, field, value): Promise<any> => {
@@ -16,12 +12,7 @@ export const selectOne = async (table, field, value): Promise<any> => {
 export const execSql = async (sql: string, values: (string | number)[] = []) : Promise<any[]> => {
 	let rows = []
 
-	const pool = new pg.Pool({
-		database: readFileSync('/run/secrets/civslog_db_name', 'utf8').trim(),
-		host: process.env.PGHOST,
-		password: readFileSync('/run/secrets/civslog_db_password', 'utf8').trim(),
-		user: readFileSync('/run/secrets/civslog_db_user', 'utf8').trim(),
-	})
+	const pool = createPool()
 
 	try {
 		const result = await pool.query(sql, values)

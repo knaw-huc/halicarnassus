@@ -23,6 +23,7 @@ services:
       PGHOST: db
     ports:
       - "3333:3000"
+      - "9856:9856"
     secrets:
       - civslog_db_name
       - civslog_db_user

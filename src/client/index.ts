@@ -58,6 +58,7 @@ async function go() {
 		rowCount,
 		to,
 	})
+	timeline.init(x => map.setRange(x))
 	timeline.change(x => map.setRange(x))
 }
 
