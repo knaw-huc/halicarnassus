@@ -1,6 +1,6 @@
 {
   "name": "civslog",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "The journal of civilization",
   "repository": "https://github.com/chronovis/civslog.git",
   "scripts": {
@@ -29,13 +29,13 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
-    "civslog-map": "^1.0.0",
+    "civslog-map": "^1.0.1",
     "express": "^4.16.3",
     "express-http-proxy": "^1.2.0",
     "node-fetch": "^2.1.2",
     "pg": "^7.4.3",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "timeline": "^2.0.1"
+    "timeline": "^2.1.1"
   }
 }
