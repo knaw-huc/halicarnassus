@@ -1,12 +1,13 @@
 const pkg = require('../../package.json')
 
+console.log(process.env)
 const template = (body: string): string =>
 `<!DOCTYPE html>
 <html>
 	<head>
 		<title>Halicarnassus ${pkg.version}</title>
 		<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
-		<link rel="stylesheet" href="/civslog-map/civslog-map.css" type="text/css">
+		<link rel="stylesheet" href="/halicarnassus-map/halicarnassus-map.css" type="text/css">
 		<script src="/build/client/bundle.js"></script>
 		<style>
 			html, body {
@@ -94,8 +95,6 @@ const template = (body: string): string =>
 	</head>
 	<body>
 		<div id="container"></div>
-		${``/*<aside id="iframe-left-container"></aside>*/}
-		${``/*<aside id="iframe-container"></aside>*/}
 		${process.env.NODE_ENV === 'development' ? '<script src="/reload/reload.js"></script>' : ''}
 	</body>
 </html>`

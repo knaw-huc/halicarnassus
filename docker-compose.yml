@@ -16,7 +16,7 @@ services:
     depends_on:
       - db
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PGHOST=db
     ports:
       - "80:3000"
