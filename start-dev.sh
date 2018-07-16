@@ -2,4 +2,4 @@
 
 node_modules/.bin/webpack --mode development
 node_modules/.bin/tsc
-docker-compose -p civslog -f docker-compose-dev.yml up --build
+docker-compose -p halicarnassus -f docker-compose-dev.yml up --build

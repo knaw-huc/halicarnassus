@@ -1,8 +1,8 @@
 {
-  "name": "civslog",
+  "name": "halicarnassus",
   "version": "1.1.2",
-  "description": "The journal of civilization",
-  "repository": "https://github.com/chronovis/civslog.git",
+  "description": "A React component for visualizing spatial and temporal data",
+  "repository": "https://github.com/ruimdetijd/halicarnassus.git",
   "scripts": {
     "start": "./start.sh",
     "start:dev": "./start-dev.sh",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
-    "civslog-map": "^1.0.1",
+    "halicarnassus-map": "^1.0.0",
     "emotion": "^9.2.6",
     "express": "^4.16.3",
     "express-http-proxy": "^1.2.0",

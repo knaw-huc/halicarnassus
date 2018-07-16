@@ -3,7 +3,6 @@ import styled from "react-emotion";
 import Timeline from "timeline"
 import TimelineMap from 'civslog-map'
 import Button, { gray } from './button'
-import { Multiplier } from "timeline/build/src/animator";
 
 const Wrapper = styled('div')`
 	align-items: center;
@@ -35,7 +34,7 @@ interface Props {
 }
 export default class Controls extends React.PureComponent<Props> {
 	render() {
-		if (this.props.timeline == null) return null
+		if (this.props.timeline == null) return <Wrapper />
 		return (
 			<Wrapper>
 				<Button onClick={this.playBackward}>◂</Button>

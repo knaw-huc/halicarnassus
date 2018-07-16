@@ -1,8 +1,10 @@
+const pkg = require('../../package.json')
+
 const template = (body: string): string =>
 `<!DOCTYPE html>
 <html>
 	<head>
-		<title>The journal of civilization</title>
+		<title>Halicarnassus ${pkg.version}</title>
 		<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
 		<link rel="stylesheet" href="/civslog-map/civslog-map.css" type="text/css">
 		<script src="/build/client/bundle.js"></script>
