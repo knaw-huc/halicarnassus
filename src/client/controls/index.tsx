@@ -41,7 +41,7 @@ export default class Controls extends React.PureComponent<Props> {
 				<Button onClick={() => this.props.timeline.animator.stop()}>II</Button>
 				<Button onClick={this.playForward}>▸</Button>
 				<Select
-					defaultValue="1x"
+					defaultValue="1"
 					onChange={a => this.props.timeline.animator.speed(a.target.value)}
 				>
 					{
