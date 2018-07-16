@@ -1,7 +1,7 @@
 import * as React from "react"
 import styled from "react-emotion";
 import Timeline from "timeline"
-import TimelineMap from 'civslog-map'
+import TimelineMap from 'halicarnassus-map'
 import Button, { gray } from './button'
 
 const Wrapper = styled('div')`

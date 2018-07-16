@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'react-emotion'
 import Timeline from 'timeline'
-import TimelineMap from 'civslog-map'
+import TimelineMap from 'halicarnassus-map'
 import Iframe from './iframe'
 import Controls from './controls'
 

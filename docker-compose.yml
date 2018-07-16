@@ -17,12 +17,9 @@ services:
       - db
     environment:
       - NODE_ENV=development
-      - PGUSER=postgres
-      - PGPASSWORD=postgis
-      - PGDATABASE=timeline
       - PGHOST=db
     ports:
-      - "3333:3000"
+      - "80:3000"
     user: node
     volumes:
       - ./:/app
