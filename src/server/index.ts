@@ -7,6 +7,8 @@ import { selectEvents } from './sql';
 import syncEvent from './sync-event'
 import { execSql, selectOne } from './db/utils';
 
+// TODO remove code used for civslog-cli
+
 const app = express()
 app.disable('x-powered-by')
 
