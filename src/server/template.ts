@@ -14,8 +14,6 @@ const template = (body: string): string =>
 				width: 100%;
 			}
 			#container {
-				display: grid;
-				grid-template-rows: 50% 50%;
 				height: 100%;
 				width: 100%;
 			}
@@ -64,15 +62,38 @@ const template = (body: string): string =>
 				height: calc(100% - 3em);
 				width: 100%;
 			}
+
+			.hire-forms-select .input-container {
+				cursor: pointer;
+				display: grid;
+				grid-template-columns: 60% 40%;
+			}
+
+			.hire-forms-select .input-container .input {
+				color: white;
+				text-align: right;
+			}
+
+			.hire-forms-select .input-container button {
+				color: white;
+				border: none;
+				background: none;
+			}
+
+			.hire-forms-select ul.hire-options {
+				position: absolute;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-align: right;
+				width: 60px;
+			}
 		</style>
 	</head>
 	<body>
-		<div id="container">
-			<div id="map"></div>
-			<div id="timeline"></div>
-		</div>
-		<aside id="iframe-left-container"></aside>
-		<aside id="iframe-container"></aside>
+		<div id="container"></div>
+		${``/*<aside id="iframe-left-container"></aside>*/}
+		${``/*<aside id="iframe-container"></aside>*/}
 		${process.env.NODE_ENV === 'development' ? '<script src="/reload/reload.js"></script>' : ''}
 	</body>
 </html>`

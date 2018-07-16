@@ -1,6 +1,6 @@
 module.exports = {
 	entry: {
-		bundle: "./src/client/index.ts",
+		bundle: "./src/client/index.tsx",
 	},
 	output: {
 		filename: "[name].js",
