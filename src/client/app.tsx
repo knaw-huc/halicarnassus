@@ -5,16 +5,29 @@ import TimelineMap from 'halicarnassus-map'
 import Iframe from './iframe'
 import Controls from './controls'
 
-const wrapperClass = css`
-	display: grid;
-	grid-template-rows: 47.5% 5% 47.5%;
-	height: 100%;
-	width: 100%;
-`
+// TODO if timeline or map is not visible, do not update it when animating (performance improv)
 
+const wrapperClass = (visible: Visible) => {
+	const template = visible === 'map' ?
+		'95% 5% 0' :
+		visible === 'timeline' ?
+			'0 5% 95%' :
+			'47.5% 5% 47.5%'
+
+	return css`
+		display: grid;
+		grid-template-rows: ${template};
+		height: 100%;
+		width: 100%;
+		transition: all 1s;
+	`
+}
+
+type Visible = 'both' | 'map' | 'timeline'
 interface State {
 	map: TimelineMap
 	timeline: Timeline
+	visible: Visible
 }
 export default class App extends React.PureComponent<null, State> {
 	constructor(props) {
@@ -22,7 +35,8 @@ export default class App extends React.PureComponent<null, State> {
 
 		this.state = {
 			map: null,
-			timeline: null
+			timeline: null,
+			visible: 'both'
 		}
 	}
 
@@ -43,9 +57,21 @@ export default class App extends React.PureComponent<null, State> {
 
 	render() {
 		return (
-			<div className={wrapperClass}>
+			<div className={wrapperClass(this.state.visible)}>
 				<div id="map" />
-				<Controls map={this.state.map} timeline={this.state.timeline} />
+				<Controls
+					map={this.state.map}
+					timeline={this.state.timeline}
+					showBoth={() => this.setState({ visible: 'both' })}
+					showMap={() => {
+						if (this.state.visible === 'map') this.setState({ visible: 'both' })
+						else this.setState({ visible: 'map' })
+					}}
+					showTimeline={() => {
+						if (this.state.visible === 'timeline') this.setState({ visible: 'both' })
+						else this.setState({ visible: 'timeline' })
+					}}
+				/>
 				<div id="timeline" />
 			</div>
 		)

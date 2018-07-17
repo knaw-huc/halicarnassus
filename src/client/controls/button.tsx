@@ -13,5 +13,4 @@ export default styled('button')`
 	cursor: pointer;
 	height: 24px; 
 	outline: none;
-	width: 24px;
 `
