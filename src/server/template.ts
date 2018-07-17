@@ -1,6 +1,5 @@
 const pkg = require('../../package.json')
 
-console.log(process.env)
 const template = (body: string): string =>
 `<!DOCTYPE html>
 <html>
@@ -64,32 +63,6 @@ const template = (body: string): string =>
 				border-bottom-right-radius: .5em;
 				height: calc(100% - 3em);
 				width: 100%;
-			}
-
-			.hire-forms-select .input-container {
-				cursor: pointer;
-				display: grid;
-				grid-template-columns: 60% 40%;
-			}
-
-			.hire-forms-select .input-container .input {
-				color: white;
-				text-align: right;
-			}
-
-			.hire-forms-select .input-container button {
-				color: white;
-				border: none;
-				background: none;
-			}
-
-			.hire-forms-select ul.hire-options {
-				position: absolute;
-				margin: 0;
-				padding: 0;
-				list-style: none;
-				text-align: right;
-				width: 60px;
 			}
 		</style>
 	</head>

@@ -33,7 +33,6 @@
     "emotion": "^9.2.6",
     "express": "^4.16.3",
     "express-http-proxy": "^1.2.0",
-    "hire-forms-select": "^2.2.12",
     "node-fetch": "^2.1.2",
     "pg": "^7.4.3",
     "react": "^16.4.1",
