@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'react-emotion'
 import Timeline from 'timeline'
-import TimelineMap from 'halicarnassus-map'
+import HalicarnassusMap from 'halicarnassus-map'
 import Iframe from './iframe'
 import Controls from './controls'
 
@@ -23,13 +23,17 @@ const wrapperClass = (visible: Visible) => {
 	`
 }
 
+// TODO turn into enum
 type Visible = 'both' | 'map' | 'timeline'
 interface State {
-	map: TimelineMap
+	map: HalicarnassusMap
 	timeline: Timeline
 	visible: Visible
 }
 export default class App extends React.PureComponent<null, State> {
+	private timeline: Timeline
+	private map: HalicarnassusMap
+
 	constructor(props) {
 		super(props)
 
@@ -46,13 +50,23 @@ export default class App extends React.PureComponent<null, State> {
 		const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&visibleRatio=.01`)
 		const [events, from, to, /* grid */, rowCount] = await response.json()
 
-		const map = this.initMap(events)
+		this.map = this.initMap(events)
 
-		const timeline = this.initTimeline(timelineEl, events, from, to, rowCount)
-		timeline.init(x => map.setRange(x))
-		timeline.change(x => map.setRange(x))
+		this.timeline = this.initTimeline(timelineEl, events, from, to, rowCount)
+		this.timeline.init(x => this.map.setRange(x))
+		this.timeline.change(x => this.map.setRange(x))
 
-		this.setState({ map, timeline })
+		this.setState({
+			map: this.map,
+			timeline: this.timeline
+		})
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.visible !== this.state.visible) {
+			this.map.updateSize()
+			this.timeline.reload()
+		}
 	}
 
 	render() {
@@ -77,8 +91,8 @@ export default class App extends React.PureComponent<null, State> {
 		)
 	}
 
-	private initMap(events): TimelineMap {
-		return new TimelineMap({
+	private initMap(events): HalicarnassusMap {
+		return new HalicarnassusMap({
 			handleEvent: (name, data) => console.log(name, data),
 			events,
 			target: 'map',
