@@ -7,10 +7,10 @@ import Controls from './controls'
 
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
 
-const wrapperClass = (visible: Visible) => {
-	const template = visible === 'map' ?
+const wrapperClass = (visibleComponents: VisibleComponents) => {
+	const template = visibleComponents === VisibleComponents.Map ?
 		'95% 5% 0' :
-		visible === 'timeline' ?
+		visibleComponents === VisibleComponents.Timeline ?
 			'0 5% 95%' :
 			'47.5% 5% 47.5%'
 
@@ -23,12 +23,11 @@ const wrapperClass = (visible: Visible) => {
 	`
 }
 
-// TODO turn into enum
-type Visible = 'both' | 'map' | 'timeline'
+enum VisibleComponents { Both, Map, Timeline }
 interface State {
 	map: HalicarnassusMap
 	timeline: Timeline
-	visible: Visible
+	visibleComponents: VisibleComponents
 }
 export default class App extends React.PureComponent<null, State> {
 	private timeline: Timeline
@@ -40,7 +39,7 @@ export default class App extends React.PureComponent<null, State> {
 		this.state = {
 			map: null,
 			timeline: null,
-			visible: 'both'
+			visibleComponents: VisibleComponents.Both
 		}
 	}
 
@@ -63,7 +62,7 @@ export default class App extends React.PureComponent<null, State> {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		if (prevState.visible !== this.state.visible) {
+		if (prevState.visible !== this.state.visibleComponents) {
 			this.map.updateSize()
 			this.timeline.reload()
 		}
@@ -71,19 +70,19 @@ export default class App extends React.PureComponent<null, State> {
 
 	render() {
 		return (
-			<div className={wrapperClass(this.state.visible)}>
+			<div className={wrapperClass(this.state.visibleComponents)}>
 				<div id="map" />
 				<Controls
 					map={this.state.map}
 					timeline={this.state.timeline}
-					showBoth={() => this.setState({ visible: 'both' })}
+					showBoth={() => this.setState({ visibleComponents: VisibleComponents.Both })}
 					showMap={() => {
-						if (this.state.visible === 'map') this.setState({ visible: 'both' })
-						else this.setState({ visible: 'map' })
+						if (this.state.visibleComponents === VisibleComponents.Map) this.setState({ visibleComponents: VisibleComponents.Both })
+						else this.setState({ visibleComponents: VisibleComponents.Map })
 					}}
 					showTimeline={() => {
-						if (this.state.visible === 'timeline') this.setState({ visible: 'both' })
-						else this.setState({ visible: 'timeline' })
+						if (this.state.visibleComponents === VisibleComponents.Timeline) this.setState({ visibleComponents: VisibleComponents.Both })
+						else this.setState({ visibleComponents: VisibleComponents.Timeline })
 					}}
 				/>
 				<div id="timeline" />
