@@ -36,7 +36,8 @@ app.delete('/api/events/:wikidataID', async (req, res) => {
 
 app.get('/api/events', async (req, res) => {
 	const { viewportWidth, visibleRatio } = req.query
-	const events = await execSql(selectEvents())
+	let events = await execSql(selectEvents())
+	events = events.filter(e => !(e.date_min == null && e.date == null && e.end_date == null && e.end_date_max == null))
 	res.send(JSON.stringify(orderEvents(events, viewportWidth, visibleRatio)))
 })
 

@@ -1,15 +1,20 @@
 import * as React from 'react'
 import { css } from 'react-emotion'
-import Timeline from 'timeline'
+import Timeline  from 'timeline'
+import TimelineConfigFactory from './timeline-config-factory';
 import HalicarnassusMap from 'halicarnassus-map'
 import Iframe from './iframe'
 import Controls from './controls'
+import { OrderedEvents } from 'timeline';
 
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
+// TODO add left, center, right date to controls bar. This is necessary when map is full screen (and animating)
+//		better yet: add progress bar! with current date(s) info 
+//		better yet: add a second timeline with only minimap and never hide it
 
 const wrapperClass = (visibleComponents: VisibleComponents) => {
 	const template = visibleComponents === VisibleComponents.Map ?
-		'95% 5% 0' :
+		'90% 5% 5%' :
 		visibleComponents === VisibleComponents.Timeline ?
 			'0 5% 95%' :
 			'47.5% 5% 47.5%'
@@ -23,7 +28,7 @@ const wrapperClass = (visibleComponents: VisibleComponents) => {
 	`
 }
 
-enum VisibleComponents { Both, Map, Timeline }
+export enum VisibleComponents { Both, Map, Timeline }
 interface State {
 	map: HalicarnassusMap
 	timeline: Timeline
@@ -31,6 +36,7 @@ interface State {
 }
 export default class App extends React.PureComponent<null, State> {
 	private timeline: Timeline
+	private timelineConfigFactory: TimelineConfigFactory
 	private map: HalicarnassusMap
 
 	constructor(props) {
@@ -47,11 +53,16 @@ export default class App extends React.PureComponent<null, State> {
 		const timelineEl = document.getElementById('timeline')
 		const viewportWidth = timelineEl.getBoundingClientRect().width
 		const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&visibleRatio=.01`)
-		const [events, from, to, /* grid */, rowCount] = await response.json()
+		const orderedEvents: OrderedEvents = await response.json()
 
-		this.map = this.initMap(events)
+		this.map = new HalicarnassusMap({
+			handleEvent: (name, data) => console.log(name, data),
+			events: orderedEvents.events,
+			target: 'map',
+		})
 
-		this.timeline = this.initTimeline(timelineEl, events, from, to, rowCount)
+		this.timelineConfigFactory = new TimelineConfigFactory(timelineEl, orderedEvents)
+		this.timeline = new Timeline(this.timelineConfigFactory.getConfig(this.state.visibleComponents))
 		this.timeline.init(x => this.map.setRange(x))
 		this.timeline.change(x => this.map.setRange(x))
 
@@ -61,10 +72,10 @@ export default class App extends React.PureComponent<null, State> {
 		})
 	}
 
-	componentDidUpdate(prevProps, prevState) {
+	componentDidUpdate(_prevProps, prevState) {
 		if (prevState.visible !== this.state.visibleComponents) {
 			this.map.updateSize()
-			this.timeline.reload()
+			this.timeline.reload(this.timelineConfigFactory.getConfig(this.state.visibleComponents))
 		}
 	}
 
@@ -88,45 +99,6 @@ export default class App extends React.PureComponent<null, State> {
 				<div id="timeline" />
 			</div>
 		)
-	}
-
-	private initMap(events): HalicarnassusMap {
-		return new HalicarnassusMap({
-			handleEvent: (name, data) => console.log(name, data),
-			events,
-			target: 'map',
-		})
-	}
-
-	private initTimeline(rootElement, events, from, to, rowCount): Timeline {
-		return new Timeline({
-			// handleEvent,
-			domains: [
-				{
-					components: new Set(['EVENTS' as 'EVENTS', 'RULERS' as 'RULERS']),
-					heightRatio: .75,
-					visibleRatio: .01,
-				},
-				{
-					components: new Set(['MINIMAP' as 'MINIMAP', 'RULERS' as 'RULERS']),
-					hasIndicatorFor: 0,
-					heightRatio: .125,
-					topOffsetRatio: .75,
-					visibleRatio: .05
-				},
-				{	
-					components: new Set(['MINIMAP' as 'MINIMAP', 'RULERS' as 'RULERS']),
-					hasIndicatorFor: 0,
-					heightRatio: .125,
-					topOffsetRatio: .875,
-				},
-			],
-			from,
-			events,
-			rootElement,
-			rowCount,
-			to,
-		})
 	}
 }
 
