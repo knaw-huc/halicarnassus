@@ -52,7 +52,7 @@ export default class App extends React.PureComponent<null, State> {
 	async componentDidMount() {
 		const timelineEl = document.getElementById('timeline')
 		const viewportWidth = timelineEl.getBoundingClientRect().width
-		const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&visibleRatio=.01`)
+		const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&zoomLevel=${6}`)
 		const orderedEvents: OrderedEvents = await response.json()
 
 		this.map = new HalicarnassusMap({

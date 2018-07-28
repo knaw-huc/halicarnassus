@@ -2,7 +2,7 @@ import * as reload from 'reload'
 import * as path from 'path'
 import * as express from 'express'
 import template from './template'
-import { orderEvents } from 'timeline'
+import { calcPixelsPerMillisecond, orderEvents } from 'timeline'
 import { selectEvents } from './sql';
 import syncEvent from './sync-event'
 import { execSql, selectOne } from './db/utils';
@@ -35,10 +35,17 @@ app.delete('/api/events/:wikidataID', async (req, res) => {
 })
 
 app.get('/api/events', async (req, res) => {
-	const { viewportWidth, visibleRatio } = req.query
+	const { viewportWidth, zoomLevel } = req.query
 	let events = await execSql(selectEvents())
 	events = events.filter(e => !(e.date_min == null && e.date == null && e.end_date == null && e.end_date_max == null))
-	res.send(JSON.stringify(orderEvents(events, viewportWidth, visibleRatio)))
+
+	const from = events[0].date_min || events[0].date
+	const to = events.reduce((prev, curr) => {
+		return Math.max(prev, curr.end_date || -Infinity, curr.end_date_max || -Infinity)
+	}, -Infinity)
+
+	const pixelsPerMilliseconds = calcPixelsPerMillisecond(viewportWidth, zoomLevel, to - from)
+	res.send(JSON.stringify(orderEvents(events, pixelsPerMilliseconds)))
 })
 
 if (process.env.NODE_ENV === 'development') reload(app)
