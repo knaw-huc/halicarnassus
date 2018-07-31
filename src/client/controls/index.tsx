@@ -11,7 +11,7 @@ const Wrapper = styled('div')`
 	border-top: 2px solid ${gray(.25)};
 	display: grid;
 	grid-gap: 1em;
-	grid-template-columns: 50% 50%;
+	grid-template-columns: 30% 40% 30%;
 	padding-right: 1em;
 `
 
@@ -39,6 +39,11 @@ const LeftSection = styled(Section)`
 	grid-template-columns: 24px 24px 24px 72px;
 `
 
+const MiddleSection = styled(Section)`
+	justify-content: center;
+	grid-template-columns: 24px 24px;
+`
+
 const RightSection = styled(Section)`
 	justify-content: right;
 	grid-template-columns: auto auto auto;
@@ -51,6 +56,8 @@ interface Props {
 	showBoth: () => void
 	showMap: () => void
 	showTimeline: () => void
+	zoomIn: () => void
+	zoomOut: () => void
 }
 export default class Controls extends React.PureComponent<Props> {
 	render() {
@@ -72,6 +79,10 @@ export default class Controls extends React.PureComponent<Props> {
 						}
 					</Select>
 				</LeftSection>
+				<MiddleSection>
+					<Button onClick={this.props.zoomIn}>+</Button>
+					<Button onClick={this.props.zoomOut}>-</Button>
+				</MiddleSection>
 				<RightSection>
 					<Button onClick={this.props.showBoth}>m/t</Button>
 					<Button onClick={this.props.showMap}>M</Button>

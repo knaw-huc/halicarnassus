@@ -62,9 +62,11 @@ export default class App extends React.PureComponent<null, State> {
 		})
 
 		this.timelineConfigFactory = new TimelineConfigFactory(timelineEl, orderedEvents)
-		this.timeline = new Timeline(this.timelineConfigFactory.getConfig(this.state.visibleComponents))
-		this.timeline.init(x => this.map.setRange(x))
-		this.timeline.change(x => this.map.setRange(x))
+		this.timeline = new Timeline(
+			this.timelineConfigFactory.getConfig(this.state.visibleComponents),
+			x => this.map.setRange(x),
+			x => this.map.onSelect(x)
+		)
 
 		this.setState({
 			map: this.map,
@@ -95,6 +97,8 @@ export default class App extends React.PureComponent<null, State> {
 						if (this.state.visibleComponents === VisibleComponents.Timeline) this.setState({ visibleComponents: VisibleComponents.Both })
 						else this.setState({ visibleComponents: VisibleComponents.Timeline })
 					}}
+					zoomIn={() => this.state.timeline.zoomIn()}
+					zoomOut={() => this.state.timeline.zoomOut()}
 				/>
 				<div id="timeline" />
 			</div>
