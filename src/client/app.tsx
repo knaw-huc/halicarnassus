@@ -74,8 +74,8 @@ export default class App extends React.PureComponent<null, State> {
 		})
 	}
 
-	componentDidUpdate(_prevProps, prevState) {
-		if (prevState.visible !== this.state.visibleComponents) {
+	componentDidUpdate(_, prevState: State) {
+		if (prevState.visibleComponents !== this.state.visibleComponents) {
 			this.map.updateSize()
 			this.timeline.reload(this.timelineConfigFactory.getConfig(this.state.visibleComponents))
 		}
