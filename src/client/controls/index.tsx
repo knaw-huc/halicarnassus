@@ -10,9 +10,7 @@ const Wrapper = styled('div')`
 	border-bottom: 2px solid ${gray(.25)};
 	border-top: 2px solid ${gray(.25)};
 	display: grid;
-	grid-gap: 1em;
 	grid-template-columns: 30% 40% 30%;
-	padding-right: 1em;
 `
 
 const Select = styled('select')`
@@ -47,7 +45,6 @@ const MiddleSection = styled(Section)`
 const RightSection = styled(Section)`
 	justify-content: right;
 	grid-template-columns: auto auto auto;
-	padding-rigth: 1em;
 `
 
 interface Props {
