@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
-    "halicarnassus-map": "^1.1.1",
+    "halicarnassus-map": "^1.1.2",
     "emotion": "^9.2.6",
     "express": "^4.16.3",
     "express-http-proxy": "^1.2.0",
@@ -38,6 +38,6 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-emotion": "^9.2.6",
-    "timeline": "^3.0.0"
+    "timeline": "^3.0.1"
   }
 }
