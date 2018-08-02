@@ -6,6 +6,7 @@ import HalicarnassusMap from 'halicarnassus-map'
 import Iframe from './iframe'
 import Controls from './controls'
 import { OrderedEvents } from 'timeline';
+import { DEFAULT_ZOOM_LEVEL } from '../constants'
 
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
 // TODO add left, center, right date to controls bar. This is necessary when map is full screen (and animating)
@@ -33,6 +34,7 @@ interface State {
 	map: HalicarnassusMap
 	timeline: Timeline
 	visibleComponents: VisibleComponents
+	zoomLevel: number
 }
 export default class App extends React.PureComponent<null, State> {
 	private timeline: Timeline
@@ -45,14 +47,15 @@ export default class App extends React.PureComponent<null, State> {
 		this.state = {
 			map: null,
 			timeline: null,
-			visibleComponents: VisibleComponents.Both
+			visibleComponents: VisibleComponents.Both,
+			zoomLevel: DEFAULT_ZOOM_LEVEL
 		}
 	}
 
 	async componentDidMount() {
 		const timelineEl = document.getElementById('timeline')
 		const viewportWidth = timelineEl.getBoundingClientRect().width
-		const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&zoomLevel=${6}`)
+		const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&zoomLevel=${DEFAULT_ZOOM_LEVEL}`)
 		const orderedEvents: OrderedEvents = await response.json()
 
 		this.map = new HalicarnassusMap({
@@ -64,7 +67,10 @@ export default class App extends React.PureComponent<null, State> {
 		this.timelineConfigFactory = new TimelineConfigFactory(timelineEl, orderedEvents)
 		this.timeline = new Timeline(
 			this.timelineConfigFactory.getConfig(this.state.visibleComponents),
-			x => this.map.setRange(x),
+			x => {
+				if (this.state.zoomLevel !== x.zoomLevel) this.setState({ zoomLevel: x.zoomLevel })
+				this.map.setRange(x)
+			},
 			x => this.map.onSelect(x)
 		)
 
@@ -98,6 +104,7 @@ export default class App extends React.PureComponent<null, State> {
 						else this.setState({ visibleComponents: VisibleComponents.Timeline })
 					}}
 					zoomIn={() => this.state.timeline.zoomIn()}
+					zoomLevel={this.state.zoomLevel}
 					zoomOut={() => this.state.timeline.zoomOut()}
 				/>
 				<div id="timeline" />

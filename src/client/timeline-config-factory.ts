@@ -1,6 +1,7 @@
 import { TimelineConfig } from "timeline";
 import { VisibleComponents } from "./app";
 import { OrderedEvents } from "timeline";
+import { DEFAULT_ZOOM_LEVEL } from "../constants";
 
 export default class TimelineConfigFactory {
 	private readonly defaultConfig: TimelineConfig = ({
@@ -11,7 +12,7 @@ export default class TimelineConfigFactory {
 					orderedEvents: this.orderedEvents,
 				},
 			],
-			zoomLevel: 6,
+			zoomLevel: DEFAULT_ZOOM_LEVEL,
 		},
 		minimaps: [
 			{

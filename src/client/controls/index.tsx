@@ -4,7 +4,13 @@ import Timeline from "timeline"
 import TimelineMap from 'halicarnassus-map'
 import Button, { gray } from './button'
 
-// TODO why does Wrapper AND RightSection need padding-rigth?
+const zoomLevels = [
+	0,
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+	11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+	21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+]
+
 const Wrapper = styled('div')`
 	background: rgb(0, 0, 0);
 	border-bottom: 2px solid ${gray(.25)};
@@ -39,7 +45,7 @@ const LeftSection = styled(Section)`
 
 const MiddleSection = styled(Section)`
 	justify-content: center;
-	grid-template-columns: 24px 24px;
+	grid-template-columns: 24px 24px 72px;
 `
 
 const RightSection = styled(Section)`
@@ -54,10 +60,12 @@ interface Props {
 	showMap: () => void
 	showTimeline: () => void
 	zoomIn: () => void
+	zoomLevel: number
 	zoomOut: () => void
 }
 export default class Controls extends React.PureComponent<Props> {
 	render() {
+		console.log(this.props.zoomLevel)
 		if (this.props.timeline == null) return <Wrapper />
 		return (
 			<Wrapper>
@@ -79,6 +87,16 @@ export default class Controls extends React.PureComponent<Props> {
 				<MiddleSection>
 					<Button onClick={this.props.zoomIn}>+</Button>
 					<Button onClick={this.props.zoomOut}>-</Button>
+					<Select
+						onChange={a => this.props.timeline.animator.zoomTo(parseInt(a.target.value))}
+						value={this.props.zoomLevel.toString()}
+					>
+						{
+							zoomLevels.map(m =>
+								<option key={m} value={m}>{`lvl ${m}`}</option>
+							)
+						}
+					</Select>
 				</MiddleSection>
 				<RightSection>
 					<Button onClick={this.props.showBoth}>m/t</Button>
