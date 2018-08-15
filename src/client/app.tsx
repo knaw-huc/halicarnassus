@@ -1,18 +1,14 @@
 import * as React from 'react'
 import { css } from 'react-emotion'
-import Timeline  from 'timeline'
-import TimelineConfigFactory from './timeline-config-factory';
+import TimelineConfigManager from './timeline-config-manager';
 import HalicarnassusMap from 'halicarnassus-map'
 import Iframe from './iframe'
 import Controls from './controls'
-import { OrderedEvents } from 'timeline';
+import Timeline, { OrderedEvents } from 'timeline';
 import { DEFAULT_ZOOM_LEVEL } from '../constants'
 
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
-// TODO add left, center, right date to controls bar. This is necessary when map is full screen (and animating)
-//		better yet: add progress bar! with current date(s) info 
-//		better yet: add a second timeline with only minimap and never hide it
-
+// TODO improve popup
 const wrapperClass = (visibleComponents: VisibleComponents) => {
 	const template = visibleComponents === VisibleComponents.Map ?
 		'90% 5% 5%' :
@@ -38,7 +34,7 @@ interface State {
 }
 export default class App extends React.PureComponent<null, State> {
 	private timeline: Timeline
-	private timelineConfigFactory: TimelineConfigFactory
+	private timelineConfigManager: TimelineConfigManager
 	private map: HalicarnassusMap
 
 	constructor(props) {
@@ -64,12 +60,13 @@ export default class App extends React.PureComponent<null, State> {
 			target: 'map',
 		})
 
-		this.timelineConfigFactory = new TimelineConfigFactory(timelineEl, orderedEvents)
+		this.timelineConfigManager = new TimelineConfigManager(timelineEl, orderedEvents)
 		this.timeline = new Timeline(
-			this.timelineConfigFactory.getConfig(this.state.visibleComponents),
+			this.timelineConfigManager.getDefaultConfig(),
 			x => {
-				if (this.state.zoomLevel !== x.zoomLevel) this.setState({ zoomLevel: x.zoomLevel })
-				this.map.setRange(x)
+				const band = x.bands[0]
+				if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
+				this.map.setRange({ visibleFrom: band.from, visibleTo: band.to })
 			},
 			x => this.map.onSelect(x)
 		)
@@ -83,7 +80,8 @@ export default class App extends React.PureComponent<null, State> {
 	componentDidUpdate(_, prevState: State) {
 		if (prevState.visibleComponents !== this.state.visibleComponents) {
 			this.map.updateSize()
-			this.timeline.reload(this.timelineConfigFactory.getConfig(this.state.visibleComponents))
+			this.timelineConfigManager.updateConfig(this.state.visibleComponents)
+			this.timeline.reload()
 		}
 	}
 
@@ -103,9 +101,9 @@ export default class App extends React.PureComponent<null, State> {
 						if (this.state.visibleComponents === VisibleComponents.Timeline) this.setState({ visibleComponents: VisibleComponents.Both })
 						else this.setState({ visibleComponents: VisibleComponents.Timeline })
 					}}
-					zoomIn={() => this.state.timeline.zoomIn()}
+					zoomIn={() => this.state.timeline}
 					zoomLevel={this.state.zoomLevel}
-					zoomOut={() => this.state.timeline.zoomOut()}
+					zoomOut={() => this.state.timeline}
 				/>
 				<div id="timeline" />
 			</div>

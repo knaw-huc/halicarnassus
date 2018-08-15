@@ -1,5 +1,5 @@
 import * as React from "react"
-import styled from "react-emotion";
+import styled from "react-emotion"
 import Timeline from "timeline"
 import TimelineMap from 'halicarnassus-map'
 import Button, { gray } from './button'
@@ -65,7 +65,6 @@ interface Props {
 }
 export default class Controls extends React.PureComponent<Props> {
 	render() {
-		console.log(this.props.zoomLevel)
 		if (this.props.timeline == null) return <Wrapper />
 		return (
 			<Wrapper>
@@ -88,7 +87,7 @@ export default class Controls extends React.PureComponent<Props> {
 					<Button onClick={this.props.zoomIn}>+</Button>
 					<Button onClick={this.props.zoomOut}>-</Button>
 					<Select
-						onChange={a => this.props.timeline.animator.zoomTo(parseInt(a.target.value))}
+						onChange={a => this.props.timeline.animator}
 						value={this.props.zoomLevel.toString()}
 					>
 						{
