@@ -7,6 +7,7 @@ import Controls from './controls'
 import Timeline, { OrderedEvents } from 'timeline';
 import { DEFAULT_ZOOM_LEVEL } from '../constants'
 
+// FIXME only show events that are visible in the timeline (now also events above and below are drawn on the map)
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
 // TODO improve popup
 const wrapperClass = (visibleComponents: VisibleComponents) => {
@@ -33,9 +34,9 @@ interface State {
 	zoomLevel: number
 }
 export default class App extends React.PureComponent<null, State> {
-	private timeline: Timeline
+	// private timeline: Timeline
 	private timelineConfigManager: TimelineConfigManager
-	private map: HalicarnassusMap
+	// private map: HalicarnassusMap
 
 	constructor(props) {
 		super(props)
@@ -54,34 +55,31 @@ export default class App extends React.PureComponent<null, State> {
 		const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&zoomLevel=${DEFAULT_ZOOM_LEVEL}`)
 		const orderedEvents: OrderedEvents = await response.json()
 
-		this.map = new HalicarnassusMap({
+		const map = new HalicarnassusMap({
 			handleEvent: (name, data) => console.log(name, data),
 			events: orderedEvents.events,
 			target: 'map',
 		})
 
 		this.timelineConfigManager = new TimelineConfigManager(timelineEl, orderedEvents)
-		this.timeline = new Timeline(
+		const timeline = new Timeline(
 			this.timelineConfigManager.getDefaultConfig(),
 			x => {
 				const band = x.bands[0]
 				if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
-				this.map.setRange({ visibleFrom: band.from, visibleTo: band.to })
+				map.setRange({ visibleFrom: band.from, visibleTo: band.to })
 			},
-			x => this.map.onSelect(x)
+			x => map.onSelect(x)
 		)
 
-		this.setState({
-			map: this.map,
-			timeline: this.timeline
-		})
+		this.setState({ map, timeline })
 	}
 
 	componentDidUpdate(_, prevState: State) {
 		if (prevState.visibleComponents !== this.state.visibleComponents) {
-			this.map.updateSize()
+			this.state.map.updateSize()
 			this.timelineConfigManager.updateConfig(this.state.visibleComponents)
-			this.timeline.reload()
+			this.state.timeline.reload()
 		}
 	}
 
@@ -90,6 +88,7 @@ export default class App extends React.PureComponent<null, State> {
 			<div className={wrapperClass(this.state.visibleComponents)}>
 				<div id="map" />
 				<Controls
+					eventsBand={this.timelineConfigManager ? this.timelineConfigManager.eventsBand : null}
 					map={this.state.map}
 					timeline={this.state.timeline}
 					showBoth={() => this.setState({ visibleComponents: VisibleComponents.Both })}
@@ -101,9 +100,9 @@ export default class App extends React.PureComponent<null, State> {
 						if (this.state.visibleComponents === VisibleComponents.Timeline) this.setState({ visibleComponents: VisibleComponents.Both })
 						else this.setState({ visibleComponents: VisibleComponents.Timeline })
 					}}
-					zoomIn={() => this.state.timeline}
+					zoomIn={() => this.timelineConfigManager.eventsBand.zoomIn()}
 					zoomLevel={this.state.zoomLevel}
-					zoomOut={() => this.state.timeline}
+					zoomOut={() => this.timelineConfigManager.eventsBand.zoomOut()}
 				/>
 				<div id="timeline" />
 			</div>

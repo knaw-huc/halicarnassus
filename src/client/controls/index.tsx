@@ -1,6 +1,6 @@
 import * as React from "react"
 import styled from "react-emotion"
-import Timeline from "timeline"
+import Timeline, { EventsBand } from "timeline"
 import TimelineMap from 'halicarnassus-map'
 import Button, { gray } from './button'
 
@@ -54,6 +54,7 @@ const RightSection = styled(Section)`
 `
 
 interface Props {
+	eventsBand: EventsBand
 	map: TimelineMap
 	timeline: Timeline
 	showBoth: () => void
@@ -87,7 +88,7 @@ export default class Controls extends React.PureComponent<Props> {
 					<Button onClick={this.props.zoomIn}>+</Button>
 					<Button onClick={this.props.zoomOut}>-</Button>
 					<Select
-						onChange={a => this.props.timeline.animator}
+						onChange={a => this.props.timeline.animator.zoomTo(this.props.eventsBand, parseInt(a.target.value, 10))}
 						value={this.props.zoomLevel.toString()}
 					>
 						{
