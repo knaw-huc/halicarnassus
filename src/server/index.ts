@@ -34,9 +34,9 @@ app.delete('/api/events/:wikidataID', async (req, res) => {
 	res.send()
 })
 
-app.get('/api/events', async (req, res) => {
+app.get('/api/events/:tagid', async (req, res) => {
 	const { viewportWidth, zoomLevel } = req.query
-	let events = await execSql(selectEvents())
+	let events = await execSql(selectEvents('WHERE event__tag.tag_id = $1 AND event__tag.event_id = event.id'), [req.params.tagid])
 	events = events.filter(e => !(e.date_min == null && e.date == null && e.end_date == null && e.end_date_max == null))
 
 	const from = events[0].date_min || events[0].date

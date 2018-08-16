@@ -5,10 +5,12 @@ import HalicarnassusMap from 'halicarnassus-map'
 import Iframe from './iframe'
 import Controls from './controls'
 import Timeline, { OrderedEvents } from 'timeline';
-import { DEFAULT_ZOOM_LEVEL } from '../constants'
+import { BATTLES_ZOOM_LEVEL } from '../constants'
 
+// FIXME center the map on active event when selecting event in timeline
+// TODO open popup with multiple features (now they are ingnored)
+// TODO if event selected on map, go to event on timeline
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
-// TODO improve popup
 const wrapperClass = (visibleComponents: VisibleComponents) => {
 	const template = visibleComponents === VisibleComponents.Map ?
 		'90% 5% 5%' :
@@ -33,9 +35,7 @@ interface State {
 	zoomLevel: number
 }
 export default class App extends React.PureComponent<null, State> {
-	// private timeline: Timeline
 	private timelineConfigManager: TimelineConfigManager
-	// private map: HalicarnassusMap
 
 	constructor(props) {
 		super(props)
@@ -44,27 +44,29 @@ export default class App extends React.PureComponent<null, State> {
 			map: null,
 			timeline: null,
 			visibleComponents: VisibleComponents.Both,
-			zoomLevel: DEFAULT_ZOOM_LEVEL
+			zoomLevel: BATTLES_ZOOM_LEVEL
 		}
 	}
 
 	async componentDidMount() {
 		const timelineEl = document.getElementById('timeline')
 		const viewportWidth = timelineEl.getBoundingClientRect().width
-		const response = await fetch(`/api/events?viewportWidth=${viewportWidth}&zoomLevel=${DEFAULT_ZOOM_LEVEL}`)
-		const orderedEvents: OrderedEvents = await response.json()
+		const response = await fetch(`/api/events/11?viewportWidth=${viewportWidth}&zoomLevel=${BATTLES_ZOOM_LEVEL}`)
+		const orderedBattles: OrderedEvents = await response.json()
 
 		const map = new HalicarnassusMap({
 			handleEvent: (name, data) => console.log(name, data),
-			events: orderedEvents.events,
 			target: 'map',
 		})
 
-		this.timelineConfigManager = new TimelineConfigManager(timelineEl, orderedEvents)
+		const warsResponse = await fetch(`/api/events/14?viewportWidth=${viewportWidth}&zoomLevel=${BATTLES_ZOOM_LEVEL}`)
+		const orderedWars: OrderedEvents = await warsResponse.json()
+
+		this.timelineConfigManager = new TimelineConfigManager(timelineEl, orderedBattles, orderedWars)
 		const timeline = new Timeline(
 			this.timelineConfigManager.getDefaultConfig(),
 			x => {
-				const band = x.bands[0]
+				const band = x.bands.find(b => b.config.label === 'battles')
 				if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
 				map.setVisibleEvents(band.visibleEvents)
 			},
@@ -87,7 +89,7 @@ export default class App extends React.PureComponent<null, State> {
 			<div className={wrapperClass(this.state.visibleComponents)}>
 				<div id="map" />
 				<Controls
-					eventsBand={this.timelineConfigManager ? this.timelineConfigManager.eventsBand : null}
+					eventsBand={this.timelineConfigManager ? this.timelineConfigManager.battlesBand : null}
 					map={this.state.map}
 					timeline={this.state.timeline}
 					showBoth={() => this.setState({ visibleComponents: VisibleComponents.Both })}
@@ -99,9 +101,9 @@ export default class App extends React.PureComponent<null, State> {
 						if (this.state.visibleComponents === VisibleComponents.Timeline) this.setState({ visibleComponents: VisibleComponents.Both })
 						else this.setState({ visibleComponents: VisibleComponents.Timeline })
 					}}
-					zoomIn={() => this.timelineConfigManager.eventsBand.zoomIn()}
+					zoomIn={() => this.timelineConfigManager.battlesBand.zoomIn()}
 					zoomLevel={this.state.zoomLevel}
-					zoomOut={() => this.timelineConfigManager.eventsBand.zoomOut()}
+					zoomOut={() => this.timelineConfigManager.battlesBand.zoomOut()}
 				/>
 				<div id="timeline" />
 			</div>

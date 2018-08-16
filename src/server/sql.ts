@@ -14,7 +14,7 @@ export const selectEvents = (where?: string) => {
 				WHERE event__location.event_id = event.id
 					AND event__location.location_id = location.id
 			) AS locations
-		FROM event`
+		FROM event, event__tag`
 
 	where = where == null ? ' ' : ` ${where} `
 
@@ -30,5 +30,6 @@ export const selectEvents = (where?: string) => {
 				WHEN event.end_date_max IS NOT NULL THEN event.end_date_max
 			END`
 
+	console.log(part1 + where + part2)
 	return part1 + where + part2
 }
