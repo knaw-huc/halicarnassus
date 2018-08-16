@@ -7,7 +7,6 @@ import Controls from './controls'
 import Timeline, { OrderedEvents } from 'timeline';
 import { DEFAULT_ZOOM_LEVEL } from '../constants'
 
-// FIXME only show events that are visible in the timeline (now also events above and below are drawn on the map)
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
 // TODO improve popup
 const wrapperClass = (visibleComponents: VisibleComponents) => {
@@ -67,7 +66,7 @@ export default class App extends React.PureComponent<null, State> {
 			x => {
 				const band = x.bands[0]
 				if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
-				map.setRange({ visibleFrom: band.from, visibleTo: band.to })
+				map.setVisibleEvents(band.visibleEvents)
 			},
 			x => map.onSelect(x)
 		)

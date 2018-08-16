@@ -10,7 +10,7 @@ export default class TimelineConfigManager {
 
 	getDefaultConfig(): TimelineConfig {
 		return {
-			center: Date.UTC(1980, 0),
+			center: Date.UTC(1810, 0),
 			bands: [
 				this.eventsBand,
 				this.minimapBand1,
