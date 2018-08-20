@@ -13,8 +13,8 @@ export class WdEntity {
 
 	constructor(entity) {
 		this.id = entity.id	
-		if (entity.labels.hasOwnProperty('en') && entity.labels.en.hasOwnProperty('value')) this.label = entity.labels.en.value
-		if (entity.descriptions.hasOwnProperty('en') && entity.descriptions.en.hasOwnProperty('value'))	this.description = entity.descriptions.en.value
+		if (entity.hasOwnProperty('labels') && entity.labels.hasOwnProperty('en') && entity.labels.en.hasOwnProperty('value')) this.label = entity.labels.en.value
+		if (entity.hasOwnProperty('descriptions') && entity.descriptions.hasOwnProperty('en') && entity.descriptions.en.hasOwnProperty('value'))	this.description = entity.descriptions.en.value
 	}
 }
 
