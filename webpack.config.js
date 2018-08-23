@@ -1,22 +1,25 @@
 module.exports = {
 	entry: {
-		bundle: "./src/client/index.tsx",
+		bundle: "./src/index.tsx",
 	},
+	mode: "development",
 	output: {
 		filename: "[name].js",
-		path: __dirname + "/build/client",
+		globalObject: 'this',
+		library: "Halicarnassus",
+		libraryTarget: "umd",
+		path: __dirname + "/dist",
+		publicPath: "/dist/",
 	},
 	resolve: {
-		// Add '.ts' and '.tsx' as resolvable extensions.
 		extensions: [".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
 	},
 	module: {
 		rules: [
-			// All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
 			{
 				test: /\.tsx?$/,
 				loader: "ts-loader",
-				options: { configFile: "tsconfig.client.json" },
+				options: { configFile: "tsconfig.json" },
 			}
 		]
 	}

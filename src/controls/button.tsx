@@ -1,6 +1,6 @@
 import styled from "react-emotion"
 
-export function gray(ratio) {
+export function gray(ratio: number) {
 	const value = 255 * ratio
 	return `rgb(${value}, ${value}, ${value})`
 }

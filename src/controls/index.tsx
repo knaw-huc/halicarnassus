@@ -54,7 +54,7 @@ const RightSection = styled(Section)`
 `
 
 interface Props {
-	eventsBand: EventsBand
+	controlBand: EventsBand
 	map: TimelineMap
 	timeline: Timeline
 	showBoth: () => void
@@ -88,7 +88,7 @@ export default class Controls extends React.PureComponent<Props> {
 					<Button onClick={this.props.zoomIn}>+</Button>
 					<Button onClick={this.props.zoomOut}>-</Button>
 					<Select
-						onChange={a => this.props.timeline.animator.zoomTo(this.props.eventsBand, parseInt(a.target.value, 10))}
+						onChange={a => this.props.timeline.animator.zoomTo(this.props.controlBand, parseInt(a.target.value, 10))}
 						value={this.props.zoomLevel.toString()}
 					>
 						{

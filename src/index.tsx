@@ -1,11 +1,8 @@
 import * as React from 'react'
-import { css } from 'react-emotion'
-import TimelineConfigManager from './timeline-config-manager';
 import HalicarnassusMap from 'halicarnassus-map'
-import Iframe from './iframe'
 import Controls from './controls'
-import Timeline, { OrderedEvents } from 'timeline';
-import { BATTLES_ZOOM_LEVEL } from '../constants'
+import Timeline, { TimelineConfig, EventsBand } from 'timeline';
+import { css } from 'emotion';
 
 // FIXME center the map on active event when selecting event in timeline
 // TODO open popup with multiple features (now they are ingnored)
@@ -27,6 +24,9 @@ const wrapperClass = (visibleComponents: VisibleComponents) => {
 	`
 }
 
+interface Props {
+	loadConfig: (el: HTMLElement) => Promise<TimelineConfig>
+}
 export enum VisibleComponents { Both, Map, Timeline }
 interface State {
 	map: HalicarnassusMap
@@ -34,52 +34,51 @@ interface State {
 	visibleComponents: VisibleComponents
 	zoomLevel: number
 }
-export default class App extends React.PureComponent<null, State> {
-	private timelineConfigManager: TimelineConfigManager
+export default class App extends React.PureComponent<Props, State> {
+	private timelineConfig: TimelineConfig = new TimelineConfig()
+	private timelineRef: React.RefObject<HTMLDivElement>
+	state: State
 
-	constructor(props) {
+	constructor(props: Props) {
 		super(props)
+
+		this.timelineRef = React.createRef()
 
 		this.state = {
 			map: null,
 			timeline: null,
 			visibleComponents: VisibleComponents.Both,
-			zoomLevel: BATTLES_ZOOM_LEVEL
+			zoomLevel: null
 		}
 	}
 
 	async componentDidMount() {
-		const timelineEl = document.getElementById('timeline')
-		const viewportWidth = timelineEl.getBoundingClientRect().width
-		const response = await fetch(`/api/events/11?viewportWidth=${viewportWidth}&zoomLevel=${BATTLES_ZOOM_LEVEL}`)
-		const orderedBattles: OrderedEvents = await response.json()
+		this.timelineConfig = await this.props.loadConfig(this.timelineRef.current)
 
 		const map = new HalicarnassusMap({
 			handleEvent: (name, data) => console.log(name, data),
 			target: 'map',
 		})
 
-		const warsResponse = await fetch(`/api/events/14?viewportWidth=${viewportWidth}&zoomLevel=${BATTLES_ZOOM_LEVEL}`)
-		const orderedWars: OrderedEvents = await warsResponse.json()
-
-		this.timelineConfigManager = new TimelineConfigManager(timelineEl, orderedBattles, orderedWars)
 		const timeline = new Timeline(
-			this.timelineConfigManager.getDefaultConfig(),
-			x => {
-				const band = x.bands.find(b => b.config.label === 'battles')
+			this.timelineConfig,
+			props => {
+				const band = this.timelineConfig.controlBand
 				if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
-				map.setVisibleEvents(band.visibleEvents)
+				map.setVisibleEvents((band as EventsBand).visibleEvents, props)
 			},
 			x => map.onSelect(x)
 		)
 
-		this.setState({ map, timeline })
+		this.setState({ map, timeline, zoomLevel: this.timelineConfig.controlBand.zoomLevel })
 	}
 
-	componentDidUpdate(_, prevState: State) {
+	componentDidUpdate(_prevProps: Props, prevState: State) {
 		if (prevState.visibleComponents !== this.state.visibleComponents) {
 			this.state.map.updateSize()
-			this.timelineConfigManager.updateConfig(this.state.visibleComponents)
+			// TODO fix
+			// this.timelineConfigManager.updateConfig(this.state.visibleComponents)
+			// this.props.updateConfig()
 			this.state.timeline.reload()
 		}
 	}
@@ -89,7 +88,7 @@ export default class App extends React.PureComponent<null, State> {
 			<div className={wrapperClass(this.state.visibleComponents)}>
 				<div id="map" />
 				<Controls
-					eventsBand={this.timelineConfigManager ? this.timelineConfigManager.battlesBand : null}
+					controlBand={this.timelineConfig.controlBand}
 					map={this.state.map}
 					timeline={this.state.timeline}
 					showBoth={() => this.setState({ visibleComponents: VisibleComponents.Both })}
@@ -101,40 +100,12 @@ export default class App extends React.PureComponent<null, State> {
 						if (this.state.visibleComponents === VisibleComponents.Timeline) this.setState({ visibleComponents: VisibleComponents.Both })
 						else this.setState({ visibleComponents: VisibleComponents.Timeline })
 					}}
-					zoomIn={() => this.timelineConfigManager.battlesBand.zoomIn()}
+					zoomIn={() => this.timelineConfig.controlBand.zoomIn()}
 					zoomLevel={this.state.zoomLevel}
-					zoomOut={() => this.timelineConfigManager.battlesBand.zoomOut()}
+					zoomOut={() => this.timelineConfig.controlBand.zoomOut()}
 				/>
-				<div id="timeline" />
+				<div ref={this.timelineRef} />
 			</div>
 		)
 	}
 }
-
-async function go() {
-	const iframe = new Iframe({
-		root: document.getElementById('iframe-container')
-	})
-	const iframeLeft = new Iframe({
-		root: document.getElementById('iframe-left-container')
-	})
-
-	function handleEvent(name, data) {
-		if (name === 'OPEN_IFRAME') {
-			iframe.src = data
-		} else if (name === 'OPEN_IFRAMES') {
-			iframeLeft.src = data.leftSrc
-			iframe.src = data.rightSrc
-		}
-	}
-	handleEvent
-
-	// const map = new CivslogMap({
-	// 	handleEvent,
-	// 	events,
-	// 	target: 'map',
-	// })
-
-	// @ts-ignore
-}
-go
