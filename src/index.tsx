@@ -8,6 +8,7 @@ import { css } from 'emotion';
 // TODO open popup with multiple features (now they are ingnored)
 // TODO if event selected on map, go to event on timeline
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
+// TODO use React to create map ui (popup)
 const wrapperClass = (visibleComponents: VisibleComponents) => {
 	const template = visibleComponents === VisibleComponents.Map ?
 		'90% 5% 5%' :
