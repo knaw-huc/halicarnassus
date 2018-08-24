@@ -1,7 +1,7 @@
 import * as React from "react"
 import styled from "react-emotion"
 import Timeline, { EventsBand } from "timeline"
-import TimelineMap from 'halicarnassus-map'
+import TimelineMap from '../map'
 import Button, { gray } from './button'
 
 const zoomLevels = [

@@ -1,0 +1,77 @@
+.clm-popup {
+	position: absolute;
+	background-color: white;
+	-webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+	filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+	padding: 15px;
+	border-radius: 10px;
+	border: 1px solid #cccccc;
+	bottom: 12px;
+	left: -50px;
+	min-width: 280px;
+}
+.clm-popup:after, .clm-popup:before {
+	top: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+.clm-popup:after {
+	border-top-color: white;
+	border-width: 10px;
+	left: 48px;
+	margin-left: -10px;
+}
+.clm-popup:before {
+	border-top-color: #cccccc;
+	border-width: 11px;
+	left: 48px;
+	margin-left: -11px;
+}
+.clm-popup > a {
+	text-decoration: none;
+	position: absolute;
+	top: 2px;
+	right: 8px;
+}
+
+.clm-popup > div {
+	font-size: .8em;
+}
+
+.clm-popup h3 {
+	margin: 0;
+}
+
+.clm-popup .wikidata-id {
+	margin-top: 1em;
+}
+
+.clm-popup .links {
+	margin-top: 2em;
+	text-align: right;
+}
+
+.clm-popup .description {
+	color: gray;
+}
+
+.clm-popup .links .reload,
+.clm-popup .links .wikidata-internal,
+.clm-popup .links .wikipedia-internal {
+	cursor: pointer;
+	display: inline-block;
+}
+
+.clm-popup .links .reload {
+	font-weight: bold;
+	font-size: 2em;
+}
+
+.clm-popup .links img {
+	width: 18px;
+	height: 18px;
+}

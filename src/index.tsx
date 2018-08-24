@@ -1,5 +1,5 @@
 import * as React from 'react'
-import HalicarnassusMap from 'halicarnassus-map'
+import HalicarnassusMap from './map'
 import Controls from './controls'
 import Timeline, { TimelineConfig, EventsBand } from 'timeline';
 import { css } from 'emotion';
