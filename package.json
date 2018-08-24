@@ -1,6 +1,6 @@
 {
   "name": "halicarnassus",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A React component for visualizing spatial and temporal data",
   "repository": "https://github.com/ruimdetijd/halicarnassus.git",
   "main": "build/index.js",
@@ -8,6 +8,7 @@
   "scripts": {
     "build": "rm -rf build && tsc",
     "dist": "rm -rf dist && webpack && webpack --config webpack.config.prod.js",
+    "release": "./release.sh",
     "watch": "tsc -w"
   },
   "author": "Gijsjan Brouwer",
@@ -22,7 +23,7 @@
     "ol": "^5.1.3",
     "react": "^16.4.2",
     "react-emotion": "^9.2.6",
-    "timeline": "^3.2.1",
+    "timeline": "^3.2.2",
     "ts-loader": "^4.5.0",
     "typescript": "^3.0.1",
     "webpack": "^4.17.1",
