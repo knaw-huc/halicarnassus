@@ -22,10 +22,10 @@
     "ol": "^5.1.3",
     "react": "^16.4.2",
     "react-emotion": "^9.2.6",
-    "timeline": "^3.1.1",
+    "timeline": "^3.2.0",
     "ts-loader": "^4.5.0",
     "typescript": "^3.0.1",
-    "webpack": "^4.16.5",
+    "webpack": "^4.17.1",
     "webpack-cli": "^3.1.0"
   }
 }
