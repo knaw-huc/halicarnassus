@@ -18,9 +18,6 @@ import Overlay from 'ol/Overlay'
 import VectorSource from 'ol/source/Vector'
 // @ts-ignore
 import View from 'ol/View'
-import Popup from './popup'
-// import { battleIconStyle } from './icons'
-import { RawEv3nt, TimelineProps } from 'timeline'
 
 // @ts-ignore
 import Style from 'ol/style/Style'
@@ -30,6 +27,8 @@ import CircleStyle from 'ol/style/Circle'
 import Fill from 'ol/style/Fill'
 // @ts-ignore
 import Stroke from 'ol/style/Stroke'
+
+import { RawEv3nt, TimelineProps } from 'timeline'
 
 const vectorSource = new VectorSource({});
 
@@ -52,39 +51,41 @@ const view = new View({
 })
 
 export interface MapProps {
-	handleEvent: (name: string, data: any) => void
+	handleEvent: (features: any[]) => void
+	popupElement: HTMLDivElement
 	target: string,
 }
 export default class Map {
 	private map: OlMap
-	private popup: Popup
 	private features: { [ eventID: string ]: Feature } = {}
+	handleEvent: any
 
 	constructor(props: MapProps) {
+		this.handleEvent = props.handleEvent
+
 		const popupOverlay = new Overlay({
-			autoPan: true,
-			autoPanAnimation: { duration: 250, source: null }
+			id: 'popup',
 		})
-
-		this.popup = new Popup(popupOverlay)
 		
-		popupOverlay.setElement(this.popup.el)
-
-		const overlays = [popupOverlay]
+		popupOverlay.setElement(props.popupElement)
 
 		this.map = new OlMap({
 			target: props.target,
 			layers,
-			overlays,
+			overlays: [popupOverlay],
 			view,
 		})
 
 		this.map.on('click', this.handleClick)
 	}
 
-	private handleClick = (e: any) => {
-		var features = this.map.getFeaturesAtPixel(e.pixel);
-		if (features != null) this.popup.show(features)
+	private handleClick = (ev: any) => {
+		console.log(ev.target)
+		var features = this.map.getFeaturesAtPixel(ev.pixel);
+		if (features != null) {
+			this.handleEvent(features)
+			this.showPopup(features[0].getGeometry().getCoordinates())
+		}
 	}
 
 	private createImageStyle(color: string) {
@@ -115,8 +116,20 @@ export default class Map {
 		return marker
 	}
 
+	private showPopup(coordinates: any) {
+		this.map.getView().animate({
+			center: coordinates,
+			duration: 250
+		})
+		this.map.getOverlayById('popup').setPosition(coordinates)
+	}
+
+	hidePopup() {
+		this.map.getOverlayById('popup').setPosition(null)
+	}
+
 	private updateFeatures(visibleEvents: RawEv3nt[]): void {
-		this.popup.hide()
+		this.hidePopup()
 
 		const features = visibleEvents
 			.reduce((prev, event) => {
@@ -141,7 +154,10 @@ export default class Map {
 
 	onSelect(event: RawEv3nt) {
 		const feature = vectorSource.getFeatures().find((f: any) => f.getProperties().event.id === event.id)
-		if (feature) this.popup.show([feature])
+		if (feature) {
+			this.handleEvent([feature])
+			this.showPopup(feature.getGeometry().getCoordinates())
+		}
 	}
 
 	setVisibleEvents(visibleEvents: RawEv3nt[], _props: TimelineProps) {

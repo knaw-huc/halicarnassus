@@ -1,8 +1,9 @@
 import * as React from 'react'
 import HalicarnassusMap from './map'
 import Controls from './controls'
-import Timeline, { TimelineConfig, EventsBand } from 'timeline';
-import { css } from 'emotion';
+import Timeline, { TimelineConfig, RawEv3nt } from 'timeline'
+import { css } from 'emotion'
+import Popup from './map/popup/index'
 
 // FIXME center the map on active event when selecting event in timeline
 // TODO open popup with multiple features (now they are ingnored)
@@ -30,6 +31,8 @@ interface Props {
 }
 export enum VisibleComponents { Both, Map, Timeline }
 interface State {
+	activeEvent: RawEv3nt,
+	activeFeatures: any[],
 	map: HalicarnassusMap
 	timeline: Timeline
 	visibleComponents: VisibleComponents
@@ -38,14 +41,19 @@ interface State {
 export default class App extends React.PureComponent<Props, State> {
 	private timelineConfig: TimelineConfig = new TimelineConfig()
 	private timelineRef: React.RefObject<HTMLDivElement>
+	private popupRef: React.RefObject<Popup>
 	state: State
+	private map: HalicarnassusMap
 
 	constructor(props: Props) {
 		super(props)
 
 		this.timelineRef = React.createRef()
+		this.popupRef = React.createRef()
 
 		this.state = {
+			activeEvent: null,
+			activeFeatures: [],
 			map: null,
 			timeline: null,
 			visibleComponents: VisibleComponents.Both,
@@ -56,8 +64,12 @@ export default class App extends React.PureComponent<Props, State> {
 	async componentDidMount() {
 		this.timelineConfig = await this.props.loadConfig(this.timelineRef.current)
 
-		const map = new HalicarnassusMap({
-			handleEvent: (name, data) => console.log(name, data),
+		this.map = new HalicarnassusMap({
+			handleEvent: (features) => {
+				console.log(features[0].getProperties().event)
+				this.setState({ activeEvent: null, activeFeatures: features })
+			},
+			popupElement: this.popupRef.current.ref.current,
 			target: 'map',
 		})
 
@@ -66,12 +78,20 @@ export default class App extends React.PureComponent<Props, State> {
 			props => {
 				const band = this.timelineConfig.controlBand
 				if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
-				map.setVisibleEvents((band as EventsBand).visibleEvents, props)
+				this.map.setVisibleEvents(band.visibleEvents, props)
 			},
-			x => map.onSelect(x)
+			event => {
+				if (event.locations && event.locations.length) {
+					this.map.onSelect(event)
+					timeline.hidePopup()
+				} else {
+					this.map.hidePopup()
+					timeline.showPopup(event)
+				}
+			}
 		)
 
-		this.setState({ map, timeline, zoomLevel: this.timelineConfig.controlBand.zoomLevel })
+		this.setState({ map: this.map, timeline, zoomLevel: this.timelineConfig.controlBand.zoomLevel })
 	}
 
 	componentDidUpdate(_prevProps: Props, prevState: State) {
@@ -106,6 +126,13 @@ export default class App extends React.PureComponent<Props, State> {
 					zoomOut={() => this.timelineConfig.controlBand.zoomOut()}
 				/>
 				<div ref={this.timelineRef} />
+				<Popup
+					close={() => this.map.hidePopup()}
+					event={this.state.activeEvent}
+					ref={this.popupRef}
+					features={this.state.activeFeatures}
+					setFeatures={activeFeatures => this.setState({ activeFeatures })}
+				/>
 			</div>
 		)
 	}

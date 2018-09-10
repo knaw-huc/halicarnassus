@@ -22,6 +22,7 @@
     "emotion": "^9.2.6",
     "ol": "^5.1.3",
     "react": "^16.4.2",
+    "react-dom": "^16.4.2",
     "react-emotion": "^9.2.6",
     "timeline": "^3.2.2",
     "ts-loader": "^4.5.0",
