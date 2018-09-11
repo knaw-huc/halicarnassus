@@ -5,7 +5,6 @@ import Timeline, { TimelineConfig, RawEv3nt } from 'timeline'
 import { css } from 'emotion'
 import Popup from './map/popup/index'
 
-// FIXME center the map on active event when selecting event in timeline
 // TODO open popup with multiple features (now they are ingnored)
 // TODO if event selected on map, go to event on timeline
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
@@ -81,7 +80,7 @@ export default class App extends React.PureComponent<Props, State> {
 				this.map.setVisibleEvents(band.visibleEvents, props)
 			},
 			event => {
-				if (event.locations && event.locations.length) {
+				if (event.locs && event.locs.length) {
 					this.map.onSelect(event)
 					timeline.hidePopup()
 				} else {

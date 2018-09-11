@@ -28,7 +28,7 @@ import Fill from 'ol/style/Fill'
 // @ts-ignore
 import Stroke from 'ol/style/Stroke'
 
-import { RawEv3nt, TimelineProps } from 'timeline'
+import { RawEv3nt, TimelineProps, Ev3ntLocation } from 'timeline'
 
 const vectorSource = new VectorSource({});
 
@@ -98,24 +98,6 @@ export default class Map {
 		})
 	}
 
-	private createFeature(event: RawEv3nt, location: any, id: string): any {
-		const coor = JSON.parse(location.f1)
-		const marker = new Feature({
-			geometry: new Point(transform(coor.coordinates, 'EPSG:4326', 'EPSG:3857')),
-			coordinates: coor,
-			date: location.f2,
-			end_date: location.f3,
-			event,
-		});
-		marker.setId(id)
-
-		marker.setStyle(new Style({
-			image: this.createImageStyle(event.color)
-		}))
-
-		return marker
-	}
-
 	private showPopup(coordinates: any) {
 		this.map.getView().animate({
 			center: coordinates,
@@ -128,14 +110,31 @@ export default class Map {
 		this.map.getOverlayById('popup').setPosition(null)
 	}
 
+	private createFeature(event: RawEv3nt, location: Ev3ntLocation, id: string): any {
+		const marker = new Feature({
+			geometry: new Point(location.coor.coordinates),
+			coordinates: new Point(location.coor.coordinates),
+			date: location.d,
+			end_date: location.ed,
+			event,
+		});
+		marker.setId(id)
+
+		marker.setStyle(new Style({
+			image: this.createImageStyle(event.color)
+		}))
+
+		return marker
+	}
+
 	private updateFeatures(visibleEvents: RawEv3nt[]): void {
 		this.hidePopup()
 
 		const features = visibleEvents
 			.reduce((prev, event) => {
-				if (event.locations == null) return prev
-				const ftrs = event.locations
-					.map((location, index) => {
+				if (event.locs == null) return prev
+				const ftrs = event.locs
+					.map((location, index: number) => {
 						const key = `${event.id}-${index}`
 						if (!this.features.hasOwnProperty(key)) {
 							this.features[key] = this.createFeature(event, location, key)

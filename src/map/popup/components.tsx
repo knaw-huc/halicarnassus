@@ -19,7 +19,7 @@ export const Wrapper = styled('div')`
 	min-width: 280px;
 
 	display: grid;
-	grid-template-columns: ${(props: Props) => props.event.has_image != null ? '128px 256px' : '320px'} auto;
+	grid-template-columns: ${(props: Props) => props.event.img != null ? '128px 256px' : '320px'} auto;
 	grid-gap: 0 1em;
 
 	&:after, &:before {

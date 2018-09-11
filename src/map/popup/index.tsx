@@ -50,14 +50,14 @@ export default class Popup extends React.PureComponent<Props, State> {
 					event != null &&
 					<PopupBody event={event} forMap={events.length > 0}>
 						<Footer>
-							<a href={`https://www.wikidata.org/wiki/${event.wikidata_identifier}`}>
+							<a href={`https://www.wikidata.org/wiki/${event.wid}`}>
 								Edit on Wikidata
 							</a>
 							&nbsp;&nbsp;
 							{
 								this.state.syncing ?
 									<span>Syncing</span> :
-									<a id="sync-button" href="#" data-id={event.wikidata_identifier}>
+									<a id="sync-button" href="#" data-id={event.wid}>
 										Sync with Wikidata
 									</a>
 							}
