@@ -1,6 +1,6 @@
 {
   "name": "halicarnassus",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "A React component for visualizing spatial and temporal data",
   "repository": "https://github.com/ruimdetijd/halicarnassus.git",
   "main": "build/index.js",
@@ -9,25 +9,31 @@
     "build": "rm -rf build && tsc",
     "dist": "rm -rf dist && webpack && webpack --config webpack.config.prod.js",
     "release": "./release.sh",
+    "start:dev": "webpack-dev-server",
     "watch": "tsc -w"
   },
   "author": "Gijsjan Brouwer",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/ol": "^4.6.2",
-    "@types/react": "^16.4.11",
-    "tslib": "^1.9.3"
+    "@types/react": "^16.4.14",
+    "ts-loader": "^5.1.1",
+    "tslib": "^1.9.3",
+    "typescript": "^3.0.3",
+    "webpack": "^4.19.1",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.8"
   },
   "dependencies": {
-    "emotion": "^9.2.6",
-    "ol": "^5.1.3",
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
-    "react-emotion": "^9.2.6",
-    "timeline": "^3.2.2",
-    "ts-loader": "^4.5.0",
-    "typescript": "^3.0.1",
-    "webpack": "^4.17.1",
-    "webpack-cli": "^3.1.0"
+    "@turf/along": "^6.0.1",
+    "@turf/bezier-spline": "^6.0.3",
+    "@turf/helpers": "^6.1.4",
+    "@turf/length": "^6.0.2",
+    "emotion": "^9.2.10",
+    "ol": "^5.2.0",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-emotion": "^9.2.10",
+    "timeline": "^3.2.2"
   }
 }

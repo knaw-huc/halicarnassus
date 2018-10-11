@@ -1,9 +1,10 @@
 import * as React from 'react'
 import HalicarnassusMap from './map'
 import Controls from './controls'
-import Timeline, { TimelineConfig, RawEv3nt } from 'timeline'
+import Timeline, { TimelineConfig, Ev3nt, EventsBand, MinimapBand, TimelineProps } from 'timeline'
 import { css } from 'emotion'
-import Popup from './map/popup/index'
+import Popup from './popup'
+import routes, { Routes } from './map/routes'
 
 // TODO open popup with multiple features (now they are ingnored)
 // TODO if event selected on map, go to event on timeline
@@ -26,11 +27,18 @@ const wrapperClass = (visibleComponents: VisibleComponents) => {
 }
 
 interface Props {
-	loadConfig: (el: HTMLElement) => Promise<TimelineConfig>
+	loadConfig: (el: HTMLElement) => Promise<TimelineConfig>,
+	loadRoutes: () => Promise<Routes>,
 }
-export enum VisibleComponents { Both, Map, Timeline }
+enum VisibleComponents { Both, Map, Timeline }
+export {
+	EventsBand,
+	MinimapBand,
+	VisibleComponents,
+	routes
+}
 interface State {
-	activeEvent: RawEv3nt,
+	activeEvent: Ev3nt,
 	activeFeatures: any[],
 	map: HalicarnassusMap
 	timeline: Timeline
@@ -65,32 +73,37 @@ export default class App extends React.PureComponent<Props, State> {
 
 		this.map = new HalicarnassusMap({
 			handleEvent: (features) => {
-				console.log(features[0].getProperties().event)
 				this.setState({ activeEvent: null, activeFeatures: features })
 			},
 			popupElement: this.popupRef.current.ref.current,
+			loadRoutes: this.props.loadRoutes,
 			target: 'map',
 		})
 
-		const timeline = new Timeline(
-			this.timelineConfig,
-			props => {
-				const band = this.timelineConfig.controlBand
-				if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
-				this.map.setVisibleEvents(band.visibleEvents, props)
-			},
-			event => {
-				if (event.locs && event.locs.length) {
-					this.map.onSelect(event)
-					timeline.hidePopup()
-				} else {
-					this.map.hidePopup()
-					timeline.showPopup(event)
-				}
+		const timeline = new Timeline(this.timelineConfig)
+		timeline.on('centerchange', (props: TimelineProps) => {
+			const visibleEvents = props.eventsBands
+				.map(band => band.visibleEvents)
+				.reduce((prev, curr) => prev.concat(curr))
+			const band = props.controlBand
+			if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
+			this.map.setVisibleEvents(visibleEvents, props)
+		})
+		timeline.on('pause', () => this.map.pause())
+		timeline.on('play', () => this.map.play())
+		timeline.on('select', (event: Ev3nt) => {
+			if (event.locs && event.locs.length) {
+				this.map.onSelect(event)
+				timeline.hidePopup()
+			} else {
+				this.map.hidePopup()
+				timeline.showPopup(event)
 			}
-		)
+		})
 
-		this.setState({ map: this.map, timeline, zoomLevel: this.timelineConfig.controlBand.zoomLevel })
+		const controlBand = this.timelineConfig.controlBand != null ? this.timelineConfig.controlBand : this.timelineConfig.bands[0]
+
+		this.setState({ map: this.map, timeline, zoomLevel: controlBand.zoomLevel })
 	}
 
 	componentDidUpdate(_prevProps: Props, prevState: State) {

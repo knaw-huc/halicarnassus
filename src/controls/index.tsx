@@ -2,14 +2,10 @@ import * as React from "react"
 import styled from "react-emotion"
 import Timeline, { EventsBand } from "timeline"
 import TimelineMap from '../map'
-import Button, { gray } from './button'
+import { Button, gray, Section, Select } from './components'
+import LeftSection from './left-section'
 
-const zoomLevels = [
-	0,
-	1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-	11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-	21, 22, 23, 24, 25, 26, 27, 28, 29, 30
-]
+const zoomLevels = [...Array(31).keys()]; // [0, 1, ..., 29, 30]
 
 const Wrapper = styled('div')`
 	background: rgb(0, 0, 0);
@@ -17,30 +13,6 @@ const Wrapper = styled('div')`
 	border-top: 2px solid ${gray(.25)};
 	display: grid;
 	grid-template-columns: 30% 40% 30%;
-`
-
-const Select = styled('select')`
-	background: none;
-	border-radius: 4px;
-	border: 2px solid ${gray(.25)};
-	color: white;
-	height: 24px;
-	outline: none;
-
-	& option {
-		color: #444;
-	}
-`
-
-const Section = styled('div')`
-	align-items: center;
-	display: grid;
-	grid-gap: 1em;
-	padding: 0 1em;
-`
-
-const LeftSection = styled(Section)`
-	grid-template-columns: 24px 24px 24px 72px;
 `
 
 const MiddleSection = styled(Section)`
@@ -64,54 +36,32 @@ interface Props {
 	zoomLevel: number
 	zoomOut: () => void
 }
-export default class Controls extends React.PureComponent<Props> {
-	render() {
-		if (this.props.timeline == null) return <Wrapper />
-		return (
-			<Wrapper>
-				<LeftSection>
-					<Button onClick={this.playBackward}>◂</Button>
-					<Button onClick={() => this.props.timeline.animator.stop()}>II</Button>
-					<Button onClick={this.playForward}>▸</Button>
-					<Select
-						defaultValue="1"
-						onChange={a => this.props.timeline.animator.speed(a.target.value)}
-					>
-						{
-							this.props.timeline.animator.multipliers.map(m =>
-								<option key={m} value={m}>{`${m}x`}</option>
-							)
-						}
-					</Select>
-				</LeftSection>
-				<MiddleSection>
-					<Button onClick={this.props.zoomIn}>+</Button>
-					<Button onClick={this.props.zoomOut}>-</Button>
-					<Select
-						onChange={a => this.props.timeline.animator.zoomTo(this.props.controlBand, parseInt(a.target.value, 10))}
-						value={this.props.zoomLevel.toString()}
-					>
-						{
-							zoomLevels.map(m =>
-								<option key={m} value={m}>{`lvl ${m}`}</option>
-							)
-						}
-					</Select>
-				</MiddleSection>
-				<RightSection>
-					<Button onClick={this.props.showBoth}>m/t</Button>
-					<Button onClick={this.props.showMap}>M</Button>
-					<Button onClick={this.props.showTimeline}>T</Button>
-				</RightSection>
-			</Wrapper>
-		)
-	}
-
-	private playBackward = () => {
-		this.props.timeline.animator.playBackward()
-	}
-
-	private playForward = () => {
-		this.props.timeline.animator.playForward()
-	}
+export default (props: Props) => {
+	if (props.timeline == null) return <Wrapper />
+	return (
+		<Wrapper>
+			<LeftSection
+				timeline={props.timeline}
+			/>
+			<MiddleSection>
+				<Button onClick={props.zoomIn}>+</Button>
+				<Button onClick={props.zoomOut}>-</Button>
+				<Select
+					onChange={a => props.timeline.animator.zoomTo(props.controlBand, parseInt(a.target.value, 10))}
+					value={props.zoomLevel.toString()}
+				>
+					{
+						zoomLevels.map(m =>
+							<option key={m} value={m}>{`lvl ${m}`}</option>
+						)
+					}
+				</Select>
+			</MiddleSection>
+			<RightSection>
+				<Button onClick={props.showBoth}>m/t</Button>
+				<Button onClick={props.showMap}>M</Button>
+				<Button onClick={props.showTimeline}>T</Button>
+			</RightSection>
+		</Wrapper>
+	)
 }

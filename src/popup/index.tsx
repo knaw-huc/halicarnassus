@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { RawEv3nt } from 'timeline';
+import { Ev3nt } from 'timeline';
 import PopupBody from './body'
 import { Footer } from './components';
 
 interface Props {
 	close: () => void
-	event: RawEv3nt
+	event: Ev3nt
 	features: any[]
 	setFeatures: (af: any[]) => void
 }
@@ -38,7 +38,7 @@ export default class Popup extends React.PureComponent<Props, State> {
 	}
 
 	render() {
-		const events: RawEv3nt[] = this.props.features.map(feature =>
+		const events: Ev3nt[] = this.props.features.map(feature =>
 			feature.getProperties().event
 		)
 
@@ -84,7 +84,7 @@ export default class Popup extends React.PureComponent<Props, State> {
 		if (!id) return
 
 		const response = await fetch(`/api/events/${id}`, { method: 'POST' })
-		const nextEvent: RawEv3nt = await response.json()
+		const nextEvent: Ev3nt = await response.json()
 
 		const features = this.props.features.map(f => {
 			const featureProps = f.getProperties()

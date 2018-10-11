@@ -1,8 +1,8 @@
 import styled from "react-emotion"
-import { RawEv3nt } from 'timeline';
+import { Ev3nt } from 'timeline';
 
 interface Props {
-	event: RawEv3nt
+	event: Ev3nt
 	forMap: boolean
 }
 export const Wrapper = styled('div')`

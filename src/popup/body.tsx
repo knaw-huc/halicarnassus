@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { Wrapper, ImgWrapper, Img, MetaData, H3, Description, Dates, H4, CloseButton } from './components'
-import { RawEv3nt, formatDate } from 'timeline';
+import { Ev3nt, formatDate } from 'timeline';
 
 interface Props {
-	event: RawEv3nt
+	event: Ev3nt
 	forMap: boolean
 }
 export default class PopupBody extends React.PureComponent<Props> {

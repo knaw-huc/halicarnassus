@@ -1,166 +1,140 @@
 // @ts-ignore
-import Feature from 'ol/Feature'
+import WebGLMap from 'ol/WebGLMap'
 // @ts-ignore
-import OlMap from 'ol/WebGLMap'
+import * as source from 'ol/source'
 // @ts-ignore
-import Point from 'ol/geom/Point'
+import * as layer from 'ol/layer'
 // @ts-ignore
-import { fromLonLat, transform } from 'ol/proj'
-// @ts-ignore
-import Stamen from 'ol/source/Stamen'
-// @ts-ignore
-import TileLayer from 'ol/layer/Tile'
-// @ts-ignore
-import VectorLayer from 'ol/layer/Vector'
-// @ts-ignore
-import Overlay from 'ol/Overlay'
-// @ts-ignore
-import VectorSource from 'ol/source/Vector'
+import * as style from 'ol/style'
 // @ts-ignore
 import View from 'ol/View'
-
 // @ts-ignore
-import Style from 'ol/style/Style'
+import { fromLonLat } from 'ol/proj'
 // @ts-ignore
-import CircleStyle from 'ol/style/Circle'
+import Select from 'ol/interaction/Select'
 // @ts-ignore
-import Fill from 'ol/style/Fill'
-// @ts-ignore
-import Stroke from 'ol/style/Stroke'
+import { click } from 'ol/events/condition'
 
-import { RawEv3nt, TimelineProps, Ev3ntLocation } from 'timeline'
+import { TimelineProps, Ev3nt } from 'timeline'
 
-const vectorSource = new VectorSource({});
-
-const markers = new VectorLayer({
-	source: vectorSource
-});
-
-const layers = [
-	new TileLayer({
-		source: new Stamen({
-			layer: 'toner-background'
-		})
-	}),
-	markers
-]
-
-const view = new View({
-	center: fromLonLat([0, 50]),
-	zoom: 4
-})
+import EventsManager from './managers/events'
+import RoutesManager from './managers/routes'
+import VoyagesManager from './managers/voyages'
+import PopupManager from './managers/popup'
+import { Routes } from './routes';
 
 export interface MapProps {
 	handleEvent: (features: any[]) => void
 	popupElement: HTMLDivElement
+	loadRoutes: () => Promise<Routes>,
 	target: string,
 }
 export default class Map {
-	private map: OlMap
-	private features: { [ eventID: string ]: Feature } = {}
+	private map: ol.Map
+	private eventsManager = new EventsManager()
+	// private routesManager: RoutesManager
+	private voyagesManager: VoyagesManager
+	private popupManager: PopupManager
 	handleEvent: any
+	private select: ol.interaction.Select
 
 	constructor(props: MapProps) {
 		this.handleEvent = props.handleEvent
 
-		const popupOverlay = new Overlay({
-			id: 'popup',
-		})
-		
-		popupOverlay.setElement(props.popupElement)
+		const tileLayer = new layer.Tile({
+			source: new source.XYZ({
+				attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
+				crossOrigin: 'anonymous',
+				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}'
+			})
+		});
 
-		this.map = new OlMap({
+		const view = new View({
+			center: fromLonLat([0, 30]),
+			zoom: 4
+		})
+
+ 		const routesManager = new RoutesManager(view, props.loadRoutes)
+		this.voyagesManager = new VoyagesManager(routesManager)
+		this.popupManager = new PopupManager(view, props.popupElement)
+
+		this.map = new WebGLMap({
 			target: props.target,
-			layers,
-			overlays: [popupOverlay],
+			layers: [
+				tileLayer,
+				routesManager.layer,
+				this.voyagesManager.layer,
+				this.eventsManager.layer
+			],
+			overlays: [
+				this.popupManager.overlay
+			],
 			view,
 		})
-
-		this.map.on('click', this.handleClick)
-	}
-
-	private handleClick = (ev: any) => {
-		console.log(ev.target)
-		var features = this.map.getFeaturesAtPixel(ev.pixel);
-		if (features != null) {
-			this.handleEvent(features)
-			this.showPopup(features[0].getGeometry().getCoordinates())
-		}
-	}
-
-	private createImageStyle(color: string) {
-		return new CircleStyle({
-			radius: 6,
-			stroke: new Stroke({
-				color: 'black',
-			}),
-			fill: new Fill({ color })
+		
+		this.select = new Select({
+			condition: click, 
+			layers: [
+				this.voyagesManager.layer,
+				// this.routesManager.layer,
+				this.eventsManager.layer
+			], 
+			multi: true
 		})
+		this.select.on('select', this.handleClick)
+		this.map.addInteraction(this.select)
+		this.map.on('postcompose', this.animate)
 	}
 
-	private showPopup(coordinates: any) {
-		this.map.getView().animate({
-			center: coordinates,
-			duration: 250
-		})
-		this.map.getOverlayById('popup').setPosition(coordinates)
+	private animate = (event: any) => {
+		this.eventsManager.renderNextFrame(event.vectorContext)
+		this.voyagesManager.renderNextFrame(event.vectorContext)
+	}
+
+	private handleClick = (_ev: any) => {
+		// console.log(ev.target)
+		console.log(this.select.getFeatures())
+	// 	var features = this.map.getFeaturesAtPixel(ev.pixel);
+	// 	console.log(features)
+	// 	return
+	// 	if (features != null) {
+	// 		this.handleEvent(features)
+	// 		this.popupManager.show(features[0].getGeometry().getCoordinates())
+	// 	}
 	}
 
 	hidePopup() {
-		this.map.getOverlayById('popup').setPosition(null)
+		this.popupManager.hide()
 	}
 
-	private createFeature(event: RawEv3nt, location: Ev3ntLocation, id: string): any {
-		const marker = new Feature({
-			geometry: new Point(location.coor.coordinates),
-			coordinates: new Point(location.coor.coordinates),
-			date: location.d,
-			end_date: location.ed,
-			event,
-		});
-		marker.setId(id)
-
-		marker.setStyle(new Style({
-			image: this.createImageStyle(event.color)
-		}))
-
-		return marker
-	}
-
-	private updateFeatures(visibleEvents: RawEv3nt[]): void {
-		this.hidePopup()
-
-		const features = visibleEvents
-			.reduce((prev, event) => {
-				if (event.locs == null) return prev
-				const ftrs = event.locs
-					.map((location, index: number) => {
-						const key = `${event.id}-${index}`
-						if (!this.features.hasOwnProperty(key)) {
-							this.features[key] = this.createFeature(event, location, key)
-						} else {
-							// Update the color (fill) of the feature
-							this.features[key].getStyle().setImage(this.createImageStyle(event.color))
-						}
-						return this.features[key]
-					})
-				return prev.concat(...ftrs)
-			}, [])
-
-		vectorSource.clear()
-		vectorSource.addFeatures(features);
-	}
-
-	onSelect(event: RawEv3nt) {
-		const feature = vectorSource.getFeatures().find((f: any) => f.getProperties().event.id === event.id)
+	onSelect(event: Ev3nt) {
+		let feature = this.eventsManager.features.find((f: any) => f.getProperties().event.id === event.id)
+		if (feature == null) {
+			feature = this.voyagesManager.features.find((f: any) => f.getProperties().event.id === event.id)
+		}
 		if (feature) {
 			this.handleEvent([feature])
-			this.showPopup(feature.getGeometry().getCoordinates())
+			this.popupManager.show(feature.getGeometry().getCoordinates())
 		}
 	}
 
-	setVisibleEvents(visibleEvents: RawEv3nt[], _props: TimelineProps) {
-		this.updateFeatures(visibleEvents)
+	play() {
+		this.eventsManager.play()
+		this.voyagesManager.play()
+	}
+
+	pause() {
+		setTimeout(() => {
+			this.eventsManager.pause()
+			this.voyagesManager.pause()
+			this.map.render()
+		}, 100)
+	}
+
+	setVisibleEvents(visibleEvents: Ev3nt[], props: TimelineProps) {
+		this.eventsManager.setCoordinates(visibleEvents)
+		this.voyagesManager.setCoordinates(visibleEvents, props.center)
+		this.map.render()
 	}
 
 	updateSize() {
