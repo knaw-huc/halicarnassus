@@ -18,10 +18,9 @@ import { click } from 'ol/events/condition'
 import { TimelineProps, Ev3nt } from 'timeline'
 
 import EventsManager from './managers/events'
-import RoutesManager from './managers/routes'
+import RoutesManager, { Routes } from './managers/routes'
 import VoyagesManager from './managers/voyages'
 import PopupManager from './managers/popup'
-import { Routes } from './routes';
 
 export interface MapProps {
 	handleEvent: (features: any[]) => void
@@ -30,12 +29,12 @@ export interface MapProps {
 	target: string,
 }
 export default class Map {
+	handleEvent: any
+
 	private map: ol.Map
 	private eventsManager = new EventsManager()
-	// private routesManager: RoutesManager
 	private voyagesManager: VoyagesManager
 	private popupManager: PopupManager
-	handleEvent: any
 	private select: ol.interaction.Select
 
 	constructor(props: MapProps) {
@@ -50,8 +49,8 @@ export default class Map {
 		});
 
 		const view = new View({
-			center: fromLonLat([0, 30]),
-			zoom: 4
+			center: fromLonLat([5, 53]),
+			zoom: 6
 		})
 
  		const routesManager = new RoutesManager(view, props.loadRoutes)
@@ -83,12 +82,14 @@ export default class Map {
 		})
 		this.select.on('select', this.handleClick)
 		this.map.addInteraction(this.select)
+
+		// FIXME this keeps on calling
 		this.map.on('postcompose', this.animate)
 	}
 
-	private animate = (event: any) => {
-		this.eventsManager.renderNextFrame(event.vectorContext)
-		this.voyagesManager.renderNextFrame(event.vectorContext)
+	private animate = (ev: any) => {
+		this.eventsManager.renderNextFrame(ev.vectorContext)
+		this.voyagesManager.renderNextFrame(ev.vectorContext)
 	}
 
 	private handleClick = (_ev: any) => {

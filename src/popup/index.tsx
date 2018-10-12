@@ -75,6 +75,7 @@ export default class Popup extends React.PureComponent<Props, State> {
 		else if (id === 'close-button') this.props.close()
 	}
 
+	// FIXME this is not Halicarnassus but CivsLog specific
 	private syncWithWikidata = async (ev: MouseEvent) => {
 		ev.preventDefault()
 
@@ -83,7 +84,7 @@ export default class Popup extends React.PureComponent<Props, State> {
 		const id = (ev.target as HTMLElement).dataset.id
 		if (!id) return
 
-		const response = await fetch(`/api/events/${id}`, { method: 'POST' })
+		const response = await fetch(`/api/events/by-wikidata-id/${id}`, { method: 'POST' })
 		const nextEvent: Ev3nt = await response.json()
 
 		const features = this.props.features.map(f => {

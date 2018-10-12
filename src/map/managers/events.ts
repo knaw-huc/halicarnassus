@@ -22,7 +22,8 @@ export default class EventsManager {
 	constructor() {
 		this.source = new source.Vector({
 			wrapX: false
-		});
+		})
+
 		this.layer = new layer.Vector({
 			source: this.source,
 			style: this.style,
@@ -50,6 +51,7 @@ export default class EventsManager {
 	}
 
 	pause() {
+		console.log(this.features)
 		this.source.addFeatures(this.features)
 	}
 

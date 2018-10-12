@@ -8,9 +8,13 @@ import * as layer from 'ol/layer'
 import View from 'ol/View'
 // @ts-ignore
 import * as style from 'ol/style'
-import turfLength from '@turf/length'
 
-import { Routes } from '../routes'
+import turfLength from '@turf/length'
+import { Feature, LineString } from '@turf/helpers'
+
+export type Routes = {
+  [key: string]: Feature<LineString>
+}
 
 export default class RoutesManager {
 	layer: layer.Vector

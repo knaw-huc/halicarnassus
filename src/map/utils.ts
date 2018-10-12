@@ -23,7 +23,7 @@ export function getFeatureStyle(color: string = 'blue') {
 
 export function createFeature(location: Ev3ntLocation, data?: any, styleFunc = getFeatureStyle) {
 	let options = {
-		geometry: new geom.Point(fromLonLat(location.coor4326)),
+		geometry: new geom.Point(fromLonLat(location.coor4326.coordinates)),
 	}
 
 	if (data != null) {

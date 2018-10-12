@@ -1,6 +1,6 @@
 <!doctype html>
 <meta charset=utf-8>
-<title>Timeline</title>
+<title>Halicarnassus - VOC voyages</title>
 <style>
 	html, body {
 		height: 100%;
@@ -18,7 +18,7 @@
 	<script>
 
 		async function loadConfig(el) {
-			const response = await fetch('./data/voyages.max.json')
+			const response = await fetch('./data/voc.json')
 			const events = await response.json()
 
 			return ({
@@ -38,7 +38,7 @@
 		}
 
 		async function loadRoutes() {
-			const response = await fetch('./data/voyages.max-routes.json')
+			const response = await fetch('./data/voc-routes.json')
 			const routes = await response.json()
 			return routes
 		}

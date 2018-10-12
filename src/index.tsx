@@ -4,7 +4,8 @@ import Controls from './controls'
 import Timeline, { TimelineConfig, Ev3nt, EventsBand, MinimapBand, TimelineProps } from 'timeline'
 import { css } from 'emotion'
 import Popup from './popup'
-import routes, { Routes } from './map/routes'
+import { Routes } from './map/managers/routes';
+// import { Routes } from './map/routes'
 
 // TODO open popup with multiple features (now they are ingnored)
 // TODO if event selected on map, go to event on timeline
@@ -28,14 +29,13 @@ const wrapperClass = (visibleComponents: VisibleComponents) => {
 
 interface Props {
 	loadConfig: (el: HTMLElement) => Promise<TimelineConfig>,
-	loadRoutes: () => Promise<Routes>,
+	loadRoutes?: () => Promise<Routes>,
 }
 enum VisibleComponents { Both, Map, Timeline }
 export {
 	EventsBand,
 	MinimapBand,
 	VisibleComponents,
-	routes
 }
 interface State {
 	activeEvent: Ev3nt,
