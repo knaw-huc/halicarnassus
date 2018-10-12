@@ -4,6 +4,8 @@ npm i
 npm run build
 npm run dist
 
+cp node_modules/timeline/popup.css examples
+
 echo -e "\n\n"
 read -p "Did you bump the version? (do it now, if you didn't! :))"
 next_version=$(node -pe 'require("./package.json").version')
