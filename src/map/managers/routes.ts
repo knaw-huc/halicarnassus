@@ -1,60 +1,69 @@
 // @ts-ignore
+import * as geom from 'ol/geom'
+// @ts-ignore
 import * as format from 'ol/format'
 // @ts-ignore
 import * as source from 'ol/source'
 // @ts-ignore
 import * as layer from 'ol/layer'
 // @ts-ignore
-import View from 'ol/View'
-// @ts-ignore
 import * as style from 'ol/style'
 
 import turfLength from '@turf/length'
 import { Feature, LineString } from '@turf/helpers'
+import { EventType } from '../constants';
+import eventBus from '../event-bus';
+import FeatureManager from './feature';
 
 export type Routes = {
   [key: string]: Feature<LineString>
 }
 
-export default class RoutesManager {
-	layer: layer.Vector
-	lengths: {[key: string]: number } = {}
-	routes: Routes
-	private source: source.Vector
+type Lengths = { [key: string]: number }
 
-	constructor(public view: View, loadRoutes: () => Promise<Routes>) {
+export default class RoutesManager extends FeatureManager {
+	private readonly style = new style.Style({
+		stroke: new style.Stroke({ color: 'rgba(255, 255, 255, .3)', width: 4 })
+	})
+	lengths: Lengths = {}
+	routes: Routes
+
+	constructor(loadRoutes: () => Promise<Routes>) {
+		super() 
+
 		this.source = new source.Vector()
 
 		this.layer = new layer.Vector({
 			source: this.source,
-			style: new style.Style({
-				stroke: new style.Stroke({ color: 'rgba(255, 255, 255, .3)', width: 4 })
-			})
+			style: this.style,
 		})
 
-		if (loadRoutes != null) loadRoutes().then(this.init)
+		loadRoutes().then(routes => {
+			if (routes == null) return
+			this.routes = routes
+			this.lengths = Object.keys(routes)
+				.reduce((prev, curr) => {
+					prev[curr] = turfLength(routes[curr])
+					return prev	
+				}, {} as Lengths)
+			eventBus.dispatch(EventType.RoutesLoad)
+		})
 	}
 
-	init = (routes: Routes) => {
-		if (routes == null) return
-		this.routes = routes
+	renderNextFrame(vectorContext: any) {
+		const coordinates = this.features.map(feat => feat.getGeometry().getCoordinates())
+		vectorContext.setStyle(this.style)
+		vectorContext.drawGeometry(new geom.MultiLineString(coordinates))
+	}
 
-		Object.keys(routes).forEach(key => {
-			this.lengths[key] = turfLength(routes[key])
-		})
-
-		const bezierRoutes: any = Object.keys(routes).map(key => routes[key])
-		const features = (new format.GeoJSON()).readFeatures({
+	setCoordinates() {
+		const bezierRoutes: any = Object.keys(this.routes).map(key => this.routes[key])
+		this.features = (new format.GeoJSON()).readFeatures({
 			type: "FeatureCollection",
 			features: bezierRoutes
 		}, {
 			dataProjection: 'EPSG:4326',
 			featureProjection: 'EPSG:3857'
 		})
-
-		this.source.addFeatures(features)
-
-		if (features.length) this.view.fit(this.source.getExtent())
 	}
-
 }

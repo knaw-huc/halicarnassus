@@ -1,6 +1,6 @@
 <!doctype html>
 <meta charset=utf-8>
-<title>Halicarnassus - Abel Tasman</title>
+<title>Halicarnassus - The Netherlands</title>
 <style>
 	html, body {
 		height: 100%;
@@ -18,37 +18,31 @@
 	<script>
 
 		async function loadConfig(el) {
-			const response = await fetch('./data/abeltasman-voyage.json')
+			const response = await fetch('./data/dutch-municipalities.json')
 			const events = await response.json()
 
 			return ({
-				center: Date.UTC(1642, 7, 14),
+				center: Date.UTC(1812, 0, 1),
 				bands: [
 					new Halicarnassus.EventsBand({
 						events,
-						zoomLevel: 4,
 						heightRatio: .9,
-					}),
-					new Halicarnassus.MinimapBand({
-						topOffsetRatio: .9,
-						heightRatio: .1,
 					})
 				],
 				rootElement: el,
 			})
 		}
 
-		async function loadRoutes() {
-			const response = await fetch('./data/abeltasman-route.json')
-			const abta_route = await response.json()
-			return { abta_route }
+		async function loadAreas() {
+			const response = await fetch('./data/dutch-municipalities-areas.json')
+			return await response.json()
 		}
 
 		document.addEventListener('DOMContentLoaded', () => {
 			const rootElement = document.getElementById('container')
 			const element = React.createElement(Halicarnassus.default, {
 				loadConfig,
-				loadRoutes,
+				loadAreas,
 			})
 			ReactDOM.render(element, rootElement)
 		})

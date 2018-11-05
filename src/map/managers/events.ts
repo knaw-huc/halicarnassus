@@ -9,17 +9,20 @@ import { fromLonLat } from 'ol/proj'
 
 import { Ev3nt, Ev3ntLocation } from 'timeline'
 import { getFeatureStyle, createFeature } from '../utils'
+import FeatureManager from './feature';
 
-export default class EventsManager {
+export default class EventsManager extends FeatureManager {
 	// private readonly style: Style = new Style({ image: getMarkerStyle('rgb(49, 220, 215)') })
 	private readonly style = getFeatureStyle('rgb(49, 220, 215)')
-	source: ol.source.Vector
 	private featuresCache: { [ eventID: string ]: ol.Feature } = {}
-	features: any[] = []
-	layer: ol.layer.Vector
+	// source: ol.source.Vector
+	// features: any[] = []
+	// layer: ol.layer.Vector
 	// select: ol.interaction.Select
 
 	constructor() {
+		super() 
+		
 		this.source = new source.Vector({
 			wrapX: false
 		})
@@ -45,15 +48,20 @@ export default class EventsManager {
 	// 	}
 	// }
 
-	play() {
-		// this.select.getFeatures().clear()
-		this.source.clear()
-	}
+	// play() {
+	// 	// this.select.getFeatures().clear()
+	// 	this.source.clear()
+	// }
 
-	pause() {
-		console.log(this.features)
-		this.source.addFeatures(this.features)
-	}
+	// pause() {
+	// 	this.drawFeatures()
+	// 	this.features = []
+	// }
+
+	// drawFeatures() {
+	// 	this.source.clear()
+	// 	this.source.addFeatures(this.features)
+	// }
 
 	renderNextFrame(vectorContext: any) {
 		for (const feature of this.features) {

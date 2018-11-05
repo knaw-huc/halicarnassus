@@ -1,4 +1,5 @@
 import turfAlong from '@turf/along'
+import turfLength from '@turf/length'
 
 // @ts-ignore
 import { fromLonLat } from 'ol/proj'
@@ -15,10 +16,11 @@ import * as layer from 'ol/layer'
 // @ts-ignore
 import * as style from 'ol/style'
 
-import { Ev3nt } from 'timeline';
+import { Ev3nt, Voyage } from 'timeline';
 import { Milliseconds } from 'timeline/build/constants';
 import { getFeatureStyle } from '../utils';
 import RoutesManager from './routes';
+import FeatureManager from './feature';
 
 const places = {
 	the_cape: {
@@ -63,14 +65,17 @@ function createPlaceMarker(name: string, coors: [number, number]) {
 	return marker
 }
 
-export default class VoyagesManager {
+export default class VoyagesManager extends FeatureManager {
 	private readonly style = getFeatureStyle('rgb(49, 220, 215)')
-	private coordinates: [number, number][] = []
-	private source: ol.source.Vector
+	// private coordinates: [number, number][] = []
+	source: ol.source.Vector
 	features: any[] = []
 	layer: ol.layer.Vector
+	routesManager: RoutesManager
 
-	constructor(private routesManager: RoutesManager) {
+	constructor() {
+		super()
+
 		this.source = new source.Vector({});
 		this.layer = new layer.Vector({
 			source: this.source,
@@ -92,36 +97,72 @@ export default class VoyagesManager {
 		}
 	}
 
-	play() {
-		// this.select.getFeatures().clear()
-		this.source.clear()
-	}
+	// play() {
+	// 	// this.select.getFeatures().clear()
+	// 	this.source.clear()
+	// }
 
-	pause() {
-		this.coordinates = []
-		this.source.addFeatures(this.features)
-	}
+	// pause() {
+	// 	this.drawFeatures()
+	// 	this.features = []
+	// }
+
+	// drawFeatures() {
+	// 	this.source.clear()
+	// 	this.source.addFeatures(this.features)
+	// }
 
 	renderNextFrame(vectorContext: any) {
+		const coordinates = this.features.map((f: any) => f.getGeometry().getCoordinates())
 		vectorContext.setStyle(this.style);
-		vectorContext.drawGeometry(new geom.MultiPoint(this.coordinates));
+		vectorContext.drawGeometry(new geom.MultiPoint(coordinates));
 	}
 
 	setCoordinates(events: Ev3nt[], center: Milliseconds): void {
-		const voyages = events 
+		const voyages: Voyage[] = events 
 			.filter(e => e.voyages != null && e.voyages.length)
 			.reduce((prev, curr) => prev.concat(curr.voyages), [])
 			.filter(voy => center > voy.d && center < voy.ed)
 
 		const positions = {
 			type: 'FeatureCollection',
-			features: voyages.map(cv => {
-				let ratio = (center - cv.d) / (cv.ed - cv.d)
-				if (!this.routesManager.routes.hasOwnProperty(cv.route)) console.error('Unknown route!')
-				const route = this.routesManager.routes[cv.route]
-				const routeLength = this.routesManager.lengths[cv.route]
+			features: voyages.map(voyage => {
+				let ratio = (center - voyage.d) / (voyage.ed - voyage.d)
+
+				let route: Feature
+				let routeLength: number
+
+				// There is no given route, so we construct a line string between
+				// the start point and the end point
+				if (voyage.route == null && voyage.sp != null && voyage.ep != null) {
+					route = {
+						type: "Feature",
+						properties: {},
+						geometry: {
+							type: "LineString",
+							coordinates: [voyage.sp.coordinates, voyage.ep.coordinates]
+						}
+					}
+					routeLength = turfLength(route)
+				}
+				// Use the given route
+				else if (
+					voyage.route != null &&
+					this.routesManager != null &&
+					this.routesManager.routes.hasOwnProperty(voyage.route)
+				) {
+					route = this.routesManager.routes[voyage.route]
+					routeLength = this.routesManager.lengths[voyage.route]
+				}
+				// No route found, we're lost :)
+				else {
+					console.error('Unknown route!')
+					return
+				}
+
 				const geoJSONFeature = turfAlong(route, ratio * routeLength)
-				geoJSONFeature.properties.route = cv.route
+				geoJSONFeature.properties.route = voyage.route
+
 				return geoJSONFeature
 			})
 		}
@@ -131,6 +172,5 @@ export default class VoyagesManager {
 			featureProjection: 'EPSG:3857'
 		})
 		
-		this.coordinates = this.features.map((f: any) => f.getGeometry().getCoordinates())
 	}
 }

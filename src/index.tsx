@@ -5,12 +5,11 @@ import Timeline, { TimelineConfig, Ev3nt, EventsBand, MinimapBand, TimelineProps
 import { css } from 'emotion'
 import Popup from './popup'
 import { Routes } from './map/managers/routes';
-// import { Routes } from './map/routes'
+import { Areas } from './map/managers/areas';
 
 // TODO open popup with multiple features (now they are ingnored)
 // TODO if event selected on map, go to event on timeline
 // TODO if timeline or map is not visible, do not update it when animating (performance improv)
-// TODO use React to create map ui (popup)
 const wrapperClass = (visibleComponents: VisibleComponents) => {
 	const template = visibleComponents === VisibleComponents.Map ?
 		'90% 5% 5%' :
@@ -28,8 +27,10 @@ const wrapperClass = (visibleComponents: VisibleComponents) => {
 }
 
 interface Props {
+	// TODO rename to loadTimelineConfig
 	loadConfig: (el: HTMLElement) => Promise<TimelineConfig>,
 	loadRoutes?: () => Promise<Routes>,
+	loadAreas?: () => Promise<Areas>,
 }
 enum VisibleComponents { Both, Map, Timeline }
 export {
@@ -72,28 +73,28 @@ export default class App extends React.PureComponent<Props, State> {
 		this.timelineConfig = await this.props.loadConfig(this.timelineRef.current)
 
 		this.map = new HalicarnassusMap({
+			// TODO remove
 			handleEvent: (features) => {
+				console.error("REMOVE ME")
 				this.setState({ activeEvent: null, activeFeatures: features })
 			},
 			popupElement: this.popupRef.current.ref.current,
 			loadRoutes: this.props.loadRoutes,
+			loadAreas: this.props.loadAreas,
 			target: 'map',
 		})
 
 		const timeline = new Timeline(this.timelineConfig)
 		timeline.on('centerchange', (props: TimelineProps) => {
-			const visibleEvents = props.eventsBands
-				.map(band => band.visibleEvents)
-				.reduce((prev, curr) => prev.concat(curr))
 			const band = props.controlBand
 			if (this.state.zoomLevel !== band.zoomLevel) this.setState({ zoomLevel: band.zoomLevel })
-			this.map.setVisibleEvents(visibleEvents, props)
+			this.map.setVisibleEvents(timeline.visibleEvents(), timeline.center())
 		})
 		timeline.on('pause', () => this.map.pause())
 		timeline.on('play', () => this.map.play())
 		timeline.on('select', (event: Ev3nt) => {
 			if (event.locs && event.locs.length) {
-				this.map.onSelect(event)
+				this.map.selectEvent(event)
 				timeline.hidePopup()
 			} else {
 				this.map.hidePopup()
@@ -101,6 +102,17 @@ export default class App extends React.PureComponent<Props, State> {
 			}
 		})
 
+		this.map.on('load', () => {
+			this.map.setVisibleEvents(timeline.visibleEvents(), timeline.center())
+			this.map.drawFeatures()
+			this.map.updateExtent()
+		})
+
+		this.map.on('select', (features: any[]) => {
+			this.setState({ activeEvent: null, activeFeatures: features })
+		})
+
+		// TODO get controleBand from timeline (timeline.controlBand() (like visibleEvents and center))
 		const controlBand = this.timelineConfig.controlBand != null ? this.timelineConfig.controlBand : this.timelineConfig.bands[0]
 
 		this.setState({ map: this.map, timeline, zoomLevel: controlBand.zoomLevel })
