@@ -1,6 +1,6 @@
 {
   "name": "halicarnassus",
-  "version": "2.1.1",
+  "version": "2.2.1",
   "description": "A React component for visualizing spatial and temporal data",
   "repository": "https://github.com/ruimdetijd/halicarnassus.git",
   "main": "build/index.js",
