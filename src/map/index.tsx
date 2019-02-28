@@ -74,17 +74,17 @@ export default class Map {
 	constructor(props: MapProps) {
 		this.handleAsyncLoaders(props.loadAreas, props.loadRoutes)
 
-		// const tileLayer = new layer.Tile({
-		// 	source: new source.XYZ({
-		// 		attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
-		// 		crossOrigin: 'anonymous',
-		// 		url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}'
-		// 	})
-		// });
-
 		const tileLayer = new layer.Tile({
-			source: new source.OSM()
-		})
+			source: new source.XYZ({
+				attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
+				crossOrigin: 'anonymous',
+				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}'
+			})
+		});
+
+		// const tileLayer = new layer.Tile({
+		// 	source: new source.OSM()
+		// })
 
 		const view = new View({
 			center: fromLonLat([5, 53]),

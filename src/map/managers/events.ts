@@ -65,7 +65,11 @@ export default class EventsManager extends FeatureManager {
 
 	renderNextFrame(vectorContext: any) {
 		for (const feature of this.features) {
-			vectorContext.drawFeature(feature, feature.getStyle());
+			// console.log(feature.getProperties(), feature.getGeometry())
+			// console.log(feature.getGeometry().getCoordinates())
+			// vectorContext.drawFeature(feature, feature.getStyle());
+			vectorContext.setStyle(getFeatureStyle(feature.getProperties().event.color))
+			vectorContext.drawGeometry(feature.getGeometry())
 		}
 	}
 

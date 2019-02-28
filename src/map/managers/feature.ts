@@ -1,14 +1,13 @@
 // @ts-ignore
-import * as source from 'ol/source'
+// import * as source from 'ol/source'
 // @ts-ignore
-import * as layer from 'ol/layer'
+// import * as layer from 'ol/layer'
 import { Ev3nt } from 'timeline';
-import { Milliseconds } from 'timeline/build/constants';
 
 export default abstract class FeatureManager {
-	source: ol.source.Vector
+	source: any/*source.Vector*/
 	features: any[] = []
-	layer: ol.layer.Vector
+	layer: any/*layer.Vector*/
 
 	play() {
 		this.source.clear()
@@ -31,5 +30,5 @@ export default abstract class FeatureManager {
 	}
 
 	abstract renderNextFrame(vectorContext: any): void
-	abstract setCoordinates(events: Ev3nt[], center: Milliseconds): void
+	abstract setCoordinates(events: Ev3nt[], center: number): void
 }

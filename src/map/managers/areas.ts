@@ -7,7 +7,7 @@ import * as source from 'ol/source'
 // @ts-ignore
 import * as layer from 'ol/layer'
 // @ts-ignore
-import View from 'ol/View'
+// import View from 'ol/View'
 // @ts-ignore
 import * as style from 'ol/style'
 // @ts-ignore
@@ -16,7 +16,6 @@ import OLPolygon from 'ol/geom/Polygon'
 import OLFeature from 'ol/Feature'
 
 import { Ev3nt } from 'timeline'
-import { Milliseconds } from 'timeline/build/constants'
 import { Feature, Polygon } from '@turf/helpers'
 import eventBus from '../event-bus'
 import { EventType } from '../constants'
@@ -39,7 +38,7 @@ export default class AreaManager extends FeatureManager {
 
 	private areas: Areas
 
-	constructor(public view: View, loadRoutes: () => Promise<Areas>) {
+	constructor(public view: any/*View*/, loadRoutes: () => Promise<Areas>) {
 		super()
 
 		this.source = new source.Vector()
@@ -77,7 +76,7 @@ export default class AreaManager extends FeatureManager {
 		vectorContext.drawGeometry(new geom.MultiPolygon(coordinates))
 	}
 
-	setCoordinates(events: Ev3nt[], center: Milliseconds): void {
+	setCoordinates(events: Ev3nt[], center: number): void {
 		const jsonFeatures: any[] = events 
 			.filter(e => e.areas != null && e.areas.length)
 			.reduce((prev, curr) => prev.concat(curr.areas), [])
